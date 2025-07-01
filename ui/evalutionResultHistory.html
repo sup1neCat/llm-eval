@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>测评结果历史</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <style type="text/tailwindcss">
+        body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f8fafc;
+    }
+    .status-pending {
+      background-color: #eff6ff;
+      color: #2563eb;
+    }
+    .status-running {
+      background-color: #fef3c7;
+      color: #d97706;
+    }
+    .status-completed-safe {
+      background-color: #dcfce7;
+      color: #16a34a;
+    }
+    .status-completed-danger {
+      background-color: #fee2e2;
+      color: #dc2626;
+    }
+    .status-failed {
+      background-color: #f3f4f6;
+      color: #4b5563;
+    }
+    /* .nav-item and .nav-item-active classes removed because @apply is not supported in standard CSS.
+       Use Tailwind utility classes directly in your HTML elements instead. */
+  </style>
+</head>
+
+<body class="bg-slate-100">
+    <div class="flex flex-col min-h-screen">
+        <nav class="bg-slate-800 text-white shadow-md">
+            <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+                <div class="flex items-center">
+                    <a class="text-xl font-bold" href="#">大模型安全检测平台</a>
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-700" href="#">数据集</a>
+                        <a class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-700" href="#">测试平台</a>
+                        <a class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-700" href="#">排行榜</a>
+                        <a class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-700" href="#">数据异变</a>
+                        <a class="px-3 py-2 rounded-md text-sm font-semibold text-sky-500 border-b-2 border-sky-500"
+                            href="#">历史记录</a>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <button
+                        class="p-2 rounded-full hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-white">
+                        <span class="material-icons">notifications</span>
+                    </button>
+                    <div class="ml-3 relative">
+                        <div>
+                            <button aria-expanded="false" aria-haspopup="true"
+                                class="max-w-xs bg-slate-800 rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-white"
+                                id="user-menu-button" type="button">
+                                <span class="sr-only">Open user menu</span>
+                                <img alt="User avatar" class="h-8 w-8 rounded-full"
+                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuAsvTqTh8m_w349kBvPZdi6MjJBMex5ZQ862zE8XRA7nrnCCuctC5c6VOfitsjj5yImyfLFdz3VtTzqiopr-lGY7ksgGP7VD4ymMoZ-TTk9JkZN4gjL5s5Oh7l6lmpbS-MET_6u8flRKgI_7MgZHCMoI3mN128MJy6crYDMDZxPbPPuMsAzdUlYBaZ15CIlTfcuYKtiO3EpmWjPNUq5Ev0iROEG7ioobPwIUw-hnedbrmq_lGk8GT25UNdbQPKWK-eGqS-kwYlCRXs" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <main class="flex-grow container mx-auto px-6 py-8">
+            <div class="bg-white p-8 rounded-lg shadow-lg">
+                <div class="flex justify-between items-center mb-2">
+                    <h2 class="text-3xl font-bold text-slate-800">历史记录</h2>
+                </div>
+                <p class="text-slate-600 mb-8">查看和管理您的测评任务与结果。</p>
+                <div class="mb-8">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-2xl font-semibold text-slate-700">测评结果历史</h3>
+                    </div>
+                    <div class="flex items-center mb-4">
+                        <div class="flex space-x-4 flex-1">
+                            <div class="relative w-80">
+                                <input
+                                    class="pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-sky-500 focus:border-sky-500 w-full"
+                                    placeholder="搜索任务ID或模型名称" type="text" />
+                                <span
+                                    class="material-icons absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400">search</span>
+                            </div>
+                            <div class="relative w-56">
+                                <select
+                                    class="pl-4 pr-10 py-2 border border-slate-300 rounded-lg focus:ring-sky-500 focus:border-sky-500 appearance-none w-full">
+                                    <option>全部状态</option>
+                                    <option>等待中</option>
+                                    <option>测评中</option>
+                                    <option>检测完成 - 发现后门</option>
+                                    <option>检测完成 - 未发现后门</option>
+                                    <option>检测失败</option>
+                                </select>
+                                <span
+                                    class="material-icons absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 pointer-events-none">expand_more</span>
+                            </div>
+                        </div>
+                        <button
+                            class="flex items-center bg-sky-500 hover:bg-sky-600 text-white font-medium py-2 px-4 rounded-lg shadow-md transition duration-150 ease-in-out ml-4">
+                            <span class="material-icons mr-2">add</span>
+                            创建新任务
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto rounded-lg border border-slate-200">
+                        <table class="w-full min-w-max text-left">
+                            <thead class="bg-slate-50 border-b border-slate-200">
+                                <tr>
+                                    <th class="px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                                        任务ID</th>
+                                    <th class="px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                                        模型名称</th>
+                                    <th class="px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                                        测评类型</th>
+                                    <th class="px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                                        提交时间</th>
+                                    <th class="px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">状态
+                                    </th>
+                                    <th class="px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">操作
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-slate-200">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
+                                        eval-task-67890</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">Model-X v1.0</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">后门检测</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">2023-10-27 15:30</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span
+                                            class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full status-completed-danger">
+                                            <span class="material-icons-outlined text-sm mr-1">error_outline</span>
+                                            检测完成 - 发现后门
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <a class="text-sky-600 hover:text-sky-800 flex items-center" href="#">
+                                            <span class="material-icons-outlined text-lg mr-1">visibility</span>查看报告
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
+                                        eval-task-67891</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">SecureLLM-Alpha</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">后门检测</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">2023-10-28 10:15</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span
+                                            class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full status-completed-safe">
+                                            <span
+                                                class="material-icons-outlined text-sm mr-1">check_circle_outline</span>
+                                            检测完成 - 未发现后门
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <a class="text-sky-600 hover:text-sky-800 flex items-center" href="#">
+                                            <span class="material-icons-outlined text-lg mr-1">visibility</span>查看报告
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
+                                        eval-task-67892</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">CodeGuardian</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">代码能力</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">2023-10-29 09:00</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span
+                                            class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full status-running">
+                                            <span
+                                                class="material-icons-outlined text-sm mr-1 animate-spin">hourglass_top</span>
+                                            测评中... (已进行 15 分钟)
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <a class="text-slate-500 hover:text-slate-700 flex items-center" href="#">
+                                            <span
+                                                class="material-icons-outlined text-lg mr-1">hourglass_empty</span>查看进度
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
+                                        eval-task-67893</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">ChatBot-Plus</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">对话能力</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">2023-10-29 11:30</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span
+                                            class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full status-pending">
+                                            <span class="material-icons-outlined text-sm mr-1">pending</span>
+                                            等待中
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <a class="text-slate-500 hover:text-slate-700 flex items-center" href="#">
+                                            <span class="material-icons-outlined text-lg mr-1">schedule</span>查看状态
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
+                                        eval-task-67894</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">TranslatePro</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">翻译能力</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">2023-10-29 14:00</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span
+                                            class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full status-failed">
+                                            <span class="material-icons-outlined text-sm mr-1">cancel</span>
+                                            检测失败
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <a class="text-red-600 hover:text-red-800 flex items-center" href="#">
+                                            <span class="material-icons-outlined text-lg mr-1">report_problem</span>
+                                            查看详情
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-6 flex justify-end">
+                        <nav aria-label="Pagination">
+                            <ul class="inline-flex items-center">
+                                <li>
+                                    <a class="h-10 py-0 px-3 text-sm flex items-center justify-center ml-0 mr-0.5 bg-white rounded-l-lg border border-slate-300 text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+                                        href="#">
+                                        <span class="material-icons-outlined text-lg">chevron_left</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="h-10 py-0 px-3 text-sm flex items-center justify-center mx-0.5 bg-white border border-slate-300 text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+                                        href="#">1</a>
+                                </li>
+                                <li>
+                                    <a aria-current="page"
+                                        class="h-10 py-0 px-3 text-sm flex items-center justify-center mx-0.5 bg-sky-50 border border-slate-300 text-sky-600 hover:bg-sky-100 hover:text-sky-700"
+                                        href="#">2</a>
+                                </li>
+                                <li>
+                                    <a class="h-10 py-0 px-3 text-sm flex items-center justify-center mx-0.5 bg-white border border-slate-300 text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+                                        href="#">3</a>
+                                </li>
+                                <li>
+                                    <a class="h-10 py-0 px-3 text-sm flex items-center justify-center ml-0.5 bg-white rounded-r-lg border border-slate-300 text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+                                        href="#">
+                                        <span class="material-icons-outlined text-lg">chevron_right</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer class="bg-slate-800 text-slate-400 text-center py-6">
+            <p>© 2025 大模型安全检测平台. All rights reserved.</p>
+        </footer>
+    </div>
+    <div class="fixed inset-0 bg-slate-900 bg-opacity-50 flex items-center justify-center p-4 hidden z-[100]"
+        id="task-submission-modal">
+        <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
+                <span class="material-icons-outlined text-3xl text-green-600">check_circle</span>
+            </div>
+            <h3 class="text-lg leading-6 font-medium text-slate-900 mb-2" id="modal-title">任务已提交！</h3>
+            <div class="mt-2">
+                <p class="text-sm text-slate-600" id="modal-message">
+                    后门检测任务已提交！任务ID: <span class="font-semibold">eval-task-67890</span>.
+                    <br />
+                    您可以在个人主页查看进度。
+                </p>
+            </div>
+            <div class="mt-5 sm:mt-6">
+                <button
+                    class="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-sky-600 text-base font-medium text-white hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 sm:text-sm"
+                    onclick="closeModal()" type="button">
+                    知道了
+                </button>
+            </div>
+        </div>
+    </div>
+    <script>
+        function showModal(title, message) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-message').innerHTML = message; // Use innerHTML for potential formatting
+            document.getElementById('task-submission-modal').classList.remove('hidden');
+        }
+        function closeModal() {
+            document.getElementById('task-submission-modal').classList.add('hidden');
+        }
+        // Example: To show the modal after a task submission (you'd call this from your task submission logic)
+        // setTimeout(() => { // Simulate task submission
+        //   showModal('后门检测任务已提交！', '任务ID: <span class="font-semibold">eval-task-67890</span>.<br>您可以在个人主页查看进度。');
+        // }, 1000); // Show after 1 second for demo
+        // Mobile menu toggle
+        const mobileMenuButton = document.querySelector('[aria-controls="mobile-menu"]');
+        const mobileMenu = document.getElementById('mobile-menu');
+        if (mobileMenuButton && mobileMenu) {
+            mobileMenuButton.addEventListener('click', () => {
+                const expanded = mobileMenuButton.getAttribute('aria-expanded') === 'true' || false;
+                mobileMenuButton.setAttribute('aria-expanded', !expanded);
+                mobileMenu.classList.toggle('hidden');
+                mobileMenu.classList.toggle('block'); // Or use a more specific class if Tailwind has one for this
+            });
+        }
+    </script>
+
+</body>
+
+</html>

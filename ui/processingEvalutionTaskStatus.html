@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>评估任务详情 - 大模型评估平台</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style type="text/tailwindcss">
+        body { font-family: 'Inter', sans-serif; }
+        .status-badge {
+          padding: 0.25rem 0.75rem;
+          border-radius: 9999px;
+          font-size: 0.75rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+        .status-running {
+          background-color: #eab3081a;color: #ca8a04;border: 1px solid #eab30880;}
+        .log-viewer {
+            background-color: #0f172a;color: #e2e8f0;font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+            font-size: 0.875rem;line-height: 1.5;
+            padding: 1rem;
+            border-radius: 0.375rem;max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #334155;}
+    </style>
+</head>
+<body class="bg-slate-100">
+    <div class="flex flex-col min-h-screen">
+        <nav class="bg-slate-800 text-white shadow-md">
+            <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+                <div class="flex items-center">
+                    <a class="text-xl font-bold" href="#">大模型安全检测平台</a>
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-700" href="#">数据集</a>
+                        <a class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-700" href="#">测试平台</a>
+                        <a class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-700" href="#">排行榜</a>
+                        <a class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-700" href="#">数据异变</a>
+                        <a class="px-3 py-2 rounded-md text-sm font-semibold text-sky-500 border-b-2 border-sky-500" href="#">历史记录</a>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <button class="p-2 rounded-full hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-white">
+                        <span class="material-icons">notifications</span>
+                    </button>
+                    <div class="ml-3 relative">
+                        <div>
+                            <button aria-expanded="false" aria-haspopup="true" class="max-w-xs bg-slate-800 rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-white" id="user-menu-button" type="button">
+                                <span class="sr-only">Open user menu</span>
+                                <img alt="User avatar" class="h-8 w-8 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAsvTqTh8m_w349kBvPZdi6MjJBMex5ZQ862zE8XRA7nrnCCuctC5c6VOfitsjj5yImyfLFdz3VtTzqiopr-lGY7ksgGP7VD4ymMoZ-TTk9JkZN4gjL5s5Oh7l6lmpbS-MET_6u8flRKgI_7MgZHCMoI3mN128MJy6crYDMDZxPbPPuMsAzdUlYBaZ15CIlTfcuYKtiO3EpmWjPNUq5Ev0iROEG7ioobPwIUw-hnedbrmq_lGk8GT25UNdbQPKWK-eGqS-kwYlCRXs" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <main class="flex-grow container mx-auto px-6 py-8">
+            <div class="space-y-6">
+                <div class="bg-white p-6 rounded-lg shadow border border-gray-200">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
+                        <div>
+                            <h2 class="text-2xl font-semibold text-gray-800">BERT情感分析评估</h2>
+                            <p class="text-sm text-gray-500 mt-1">任务ID: <span class="font-medium text-gray-700">eval-bert-sentiment-001</span></p>
+                        </div>
+                        <div class="mt-4 md:mt-0 flex items-center space-x-3">
+                            <span class="status-badge status-running">进行中</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-gray-600">
+                        <div>
+                            <span class="font-medium">模型:</span> BERT-base-uncased
+                        </div>
+                        <div>
+                            <span class="font-medium">数据集:</span> IMDB Movie Reviews
+                        </div>
+                        <div>
+                            <span class="font-medium">开始时间:</span> 2024-03-10 10:00:00
+                        </div>
+                        <div>
+                            <span class="font-medium">预计完成时间:</span> 2024-03-10 11:40:12
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow border border-gray-200">
+                    <div class="mb-4">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm text-gray-700 font-medium">进度</span>
+                            <span class="text-sm text-gray-500">40%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3">
+                            <div class="bg-yellow-400 h-3 rounded-full" style="width: 40%"></div>
+                        </div>
+                    </div>
+                    <div class="text-sm text-gray-500 mb-6">预计剩余用时：45分钟</div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">执行日志</h3>
+                    <div class="log-viewer">
+                        <pre>[2024-03-10 10:00:00] INFO: Evaluation task eval-bert-sentiment-001 started.
+[2024-03-10 10:00:01] INFO: Loading model: bert-base-uncased...
+[2024-03-10 10:00:15] INFO: Model loaded successfully.
+[2024-03-10 10:00:16] INFO: Loading dataset: IMDB Movie Reviews (25000 samples)...
+[2024-03-10 10:00:25] INFO: Dataset loaded and preprocessed.
+[2024-03-10 10:00:26] INFO: Starting evaluation...
+[2024-03-10 10:00:30] INFO: Batch 1/250 processed.
+[2024-03-10 10:05:00] INFO: Batch 50/250 processed.
+[2024-03-10 10:15:00] INFO: Batch 100/250 processed.
+</pre>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer class="bg-slate-800 text-slate-400 text-center py-6">
+            <p>© 2025 大模型安全检测平台. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>

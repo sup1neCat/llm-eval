@@ -1,0 +1,88 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+### 项目规则
+
+#### 1. 目录结构
+
+- `src/apis`: 存放所有后端 API 接口的定义。按模块划分子目录，例如 `src/apis/system`、`src/apis/auth`。
+- `src/assets`: 存放静态资源，如字体 (`fonts`)、图标 (`icons`) 和图片 (`images`)。
+- `src/components`: 存放可复用的 Vue 组件。每个组件应有自己的目录，包含组件文件 (`.vue`) 和相关逻辑/样式文件。
+- `src/config`: 存放应用配置，如 `setting.ts`。
+- `src/constant`: 存放常量定义，如 `common.ts`、`file.ts`。
+- `src/directives`: 存放 Vue 自定义指令。
+- `src/hooks`: 存放可复用的组合式函数 (Composition API)。按模块划分子目录，例如 `src/hooks/app`、`src/hooks/modules`。
+- `src/layout`: 存放应用布局组件。
+- `src/mock`: 存放模拟数据和模拟 API 接口。
+- `src/router`: 存放路由配置，包括异步模块 (`asyncModules.ts`)、路由守卫 (`guard.ts`) 和路由定义 (`route.ts`)。
+- `src/stores`: 存放 Pinia 状态管理模块。按模块划分子目录，例如 `src/stores/modules`。
+- `src/styles`: 存放全局样式和模块样式，如 `base.scss`、`global.scss`。
+- `src/types`: 存放 TypeScript 类型定义文件。
+- `src/utils`: 存放工具函数，如 `auth.ts`、`http.ts`、`message-error-wrapper.ts`。
+- `src/views`: 存放页面组件。按模块划分子目录，例如 `src/views/system`、`src/views/dashboard`。
+
+#### 2. 命名约定
+
+- **文件/目录**: 统一使用 kebab-case (短横线命名法)，例如 `user-management.vue`、`user-profile.ts`。
+- **组件**: 使用 PascalCase (大驼峰命名法)，例如 `UserProfile`、`LayoutDefault`。
+- **变量/函数**: 使用 camelCase (小驼峰命名法)，例如 `userName`、`getUserList`。
+- **常量**: 使用 SCREAMING_SNAKE_CASE (全大写下划线命名法)，例如 `API_BASE_URL`。
+- **类型定义**: 使用 PascalCase 并以 `Type` 或 `Interface` 结尾，例如 `UserType`、`AuthInterface`。
+
+#### 3. 代码风格
+
+- **TypeScript**: 严格遵循 TypeScript 最佳实践，充分利用类型系统。
+- **ESLint/Prettier**: 保持代码格式化和风格一致性，遵循 `.eslintrc.js` 和 `prettier.config.js` 的配置。
+- **Vue 组件**: 
+  - `<script setup>` 语法糖。
+  - 优先使用 Composition API。
+  - Props 定义应包含类型、默认值和校验。
+  - Emits 定义应明确事件名称。
+- **注释**: 关键逻辑和复杂部分应添加清晰的注释。
+
+#### 4. 组件使用
+
+- **全局组件**: 仅注册少量通用且频繁使用的组件为全局组件。
+- **局部组件**: 大多数组件应按需局部导入和使用。
+- **组件通信**: 优先使用 `props` 和 `emits` 进行父子组件通信；对于非父子组件通信，考虑使用 Pinia 或 `mitt`。
+
+#### 5. API 调用
+
+- **统一管理**: 所有 API 请求通过 `src/apis` 目录下的模块进行统一管理。
+- **错误处理**: 使用 `src/utils/http.ts` 统一处理 HTTP 请求和响应，包括错误拦截和提示。
+- **类型安全**: API 请求和响应数据应定义 TypeScript 类型。
+
+#### 6. 状态管理
+
+- **Pinia**: 使用 Pinia 进行状态管理。
+- **模块化**: 将不同模块的状态拆分到 `src/stores/modules` 目录下的不同 store 中。
+- **命名空间**: 避免命名冲突，合理使用 Pinia 的命名空间特性。
+
+#### 7. 路由
+
+- **集中配置**: 所有路由配置集中在 `src/router` 目录下。
+- **路由守卫**: 在 `src/router/guard.ts` 中统一处理登录认证、权限校验等路由守卫逻辑。
+- **动态路由**: 根据用户权限动态生成和添加路由。
+
+#### 8. 样式
+
+- **SCSS**: 统一使用 SCSS 进行样式编写。
+- **BEM 规范**: 推荐使用 BEM (Block Element Modifier) 命名规范来组织 CSS 类名。
+- **变量/Mixin**: 在 `src/styles/var.scss` 和 `src/styles/mixin.scss` 中定义全局变量和 Mixin，提高样式复用性。
+- **组件作用域**: Vue 组件的样式应使用 `<style scoped>` 限制作用域，避免样式冲突。
+- **组件库使用**: 使用Element Plus组件库。
+
+#### 9. Git 提交规范
+
+- **Conventional Commits**: 遵循 Conventional Commits 规范，例如 `feat: add new feature`、`fix: fix bug`。
+- **分支策略**: 推荐使用 Git Flow 或 GitHub Flow 分支策略。
+
+#### 10. 性能优化
+
+- **按需加载**: 路由和组件应按需加载，减少初始加载时间。
+- **图片优化**: 压缩图片，使用 WebP 等现代格式。
+- **缓存**: 合理利用浏览器缓存和 CDN。
+
+        

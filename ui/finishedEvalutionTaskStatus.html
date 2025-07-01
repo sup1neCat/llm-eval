@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>评估任务详情 - 大模型评估平台</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <style type="text/tailwindcss">
+        body {
+      font-family: 'Inter', sans-serif;
+    }
+    .bg-slate-800 {
+      background-color: #1e293b;
+    }
+    .bg-slate-700 {
+      background-color: #334155;
+    }
+    .bg-slate-600 {
+      background-color: #475569;
+    }
+    .bg-slate-500 {
+      background-color: #64748b;
+    }
+    .bg-slate-400 {
+      background-color: #94a3b8;
+    }
+    .text-slate-400 {
+      color: #cbd5e1;
+    }
+    .text-slate-500 {
+      color: #64748b;
+    }
+    .text-slate-600 {
+      color: #475569;
+    }
+    .text-slate-700 {
+      color: #334155;
+    }
+    .text-slate-800 {
+      color: #1e293b;
+    }
+    .active-nav {
+      border-left: 4px solid #3b82f6;background-color: #1f2937;color: #ffffff;
+    }
+    .status-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .status-running {
+      background-color: #eab3081a;color: #ca8a04;border: 1px solid #eab30880;}
+    .status-completed {
+      background-color: #22c55e1a;color: #16a34a;border: 1px solid #22c55e80;}
+    .status-failed {
+      background-color: #ef44441a;color: #dc2626;border: 1px solid #ef444480;}
+    .metric-card {
+      background-color: #ffffff;
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e5e7eb;}
+    .log-viewer {
+        background-color: #0f172a;color: #e2e8f0;font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+        font-size: 0.875rem;line-height: 1.5;
+        padding: 1rem;
+        border-radius: 0.375rem;max-height: 400px;
+        overflow-y: auto;
+        border: 1px solid #334155;}
+  </style>
+</head>
+
+<body class="bg-slate-100">
+    <div class="flex flex-col min-h-screen">
+        <nav class="bg-slate-800 text-white shadow-md">
+            <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+                <div class="flex items-center">
+                    <a class="text-xl font-bold" href="#">大模型安全检测平台</a>
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-700" href="#">数据集</a>
+                        <a class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-700" href="#">测试平台</a>
+                        <a class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-700" href="#">排行榜</a>
+                        <a class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-700" href="#">数据异变</a>
+                        <a class="px-3 py-2 rounded-md text-sm font-semibold text-sky-500 border-b-2 border-sky-500"
+                            href="#">历史记录</a>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <button
+                        class="p-2 rounded-full hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-white">
+                        <span class="material-icons">notifications</span>
+                    </button>
+                    <div class="ml-3 relative">
+                        <div>
+                            <button aria-expanded="false" aria-haspopup="true"
+                                class="max-w-xs bg-slate-800 rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-white"
+                                id="user-menu-button" type="button">
+                                <span class="sr-only">Open user menu</span>
+                                <img alt="User avatar" class="h-8 w-8 rounded-full"
+                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuAsvTqTh8m_w349kBvPZdi6MjJBMex5ZQ862zE8XRA7nrnCCuctC5c6VOfitsjj5yImyfLFdz3VtTzqiopr-lGY7ksgGP7VD4ymMoZ-TTk9JkZN4gjL5s5Oh7l6lmpbS-MET_6u8flRKgI_7MgZHCMoI3mN128MJy6crYDMDZxPbPPuMsAzdUlYBaZ15CIlTfcuYKtiO3EpmWjPNUq5Ev0iROEG7ioobPwIUw-hnedbrmq_lGk8GT25UNdbQPKWK-eGqS-kwYlCRXs" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <main class="flex-grow container mx-auto px-6 py-8">
+            <div class="space-y-6">
+                <div class="bg-white p-6 rounded-lg shadow border border-gray-200">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
+                        <div>
+                            <h2 class="text-2xl font-semibold text-gray-800">BERT情感分析评估</h2>
+                            <p class="text-sm text-gray-500 mt-1">任务ID: <span
+                                    class="font-medium text-gray-700">eval-bert-sentiment-001</span></p>
+                        </div>
+                        <div class="mt-4 md:mt-0 flex items-center space-x-3">
+                            <span class="status-badge status-completed">已完成</span>
+                            <button
+                                class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg flex items-center space-x-2 transition duration-150 text-sm">
+                                <span class="material-icons text-base">file_download</span>
+                                <span>下载报告</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-gray-600">
+                        <div>
+                            <span class="font-medium">模型:</span> BERT-base-uncased
+                        </div>
+                        <div>
+                            <span class="font-medium">数据集:</span> IMDB Movie Reviews
+                        </div>
+                        <div>
+                            <span class="font-medium">开始时间:</span> 2024-03-10 10:00:00
+                        </div>
+                        <div>
+                            <span class="font-medium">完成时间:</span> 2024-03-10 10:45:12
+                        </div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="metric-card">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-1">准确率 (Accuracy)</h3>
+                        <p class="text-3xl font-bold text-blue-600">92.5%</p>
+                        <p class="text-sm text-gray-500 mt-2">模型正确分类的样本比例。</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-1">精确率 (Precision)</h3>
+                        <p class="text-3xl font-bold text-green-600">90.1%</p>
+                        <p class="text-sm text-gray-500 mt-2">预测为正的样本中实际为正的比例。</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-1">召回率 (Recall)</h3>
+                        <p class="text-3xl font-bold text-purple-600">88.7%</p>
+                        <p class="text-sm text-gray-500 mt-2">实际为正的样本中被正确预测为正的比例。</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-1">F1分数 (F1-Score)</h3>
+                        <p class="text-3xl font-bold text-yellow-600">89.4%</p>
+                        <p class="text-sm text-gray-500 mt-2">精确率和召回率的调和平均数。</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-1">AUC-ROC</h3>
+                        <p class="text-3xl font-bold text-pink-600">0.95</p>
+                        <p class="text-sm text-gray-500 mt-2">ROC曲线下面积，衡量分类器性能。</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-1">平均推断时间</h3>
+                        <p class="text-3xl font-bold text-teal-600">15.2 ms/样本</p>
+                        <p class="text-sm text-gray-500 mt-2">单个样本的平均处理时长。</p>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow border border-gray-200">
+                    <div class="border-b border-gray-200 mb-4">
+                        <nav aria-label="Tabs" class="-mb-px flex space-x-8">
+                            <a class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm border-blue-600 text-blue-600"
+                                href="#" id="tab-log">
+                                执行日志
+                            </a>
+                            <a class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                                href="#" id="tab-config">
+                                配置详情
+                            </a>
+                            <a class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                                href="#" id="tab-chart">
+                                可视化图表
+                            </a>
+                        </nav>
+                    </div>
+                    <div id="tab-content-log">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-3">执行日志</h3>
+                        <div class="log-viewer">
+                            <pre>[2024-03-10 10:00:00] INFO: Evaluation task eval-bert-sentiment-001 started.
+[2024-03-10 10:00:01] INFO: Loading model: bert-base-uncased...
+[2024-03-10 10:00:15] INFO: Model loaded successfully.
+[2024-03-10 10:00:16] INFO: Loading dataset: IMDB Movie Reviews (25000 samples)...
+[2024-03-10 10:00:25] INFO: Dataset loaded and preprocessed.
+[2024-03-10 10:00:26] INFO: Starting evaluation...
+[2024-03-10 10:00:30] INFO: Batch 1/250 processed.
+[2024-03-10 10:05:00] INFO: Batch 50/250 processed.
+[2024-03-10 10:15:00] INFO: Batch 100/250 processed.
+[2024-03-10 10:30:00] INFO: Batch 200/250 processed.
+[2024-03-10 10:45:00] INFO: Batch 250/250 processed. Evaluation complete.
+[2024-03-10 10:45:05] INFO: Calculating metrics...
+[2024-03-10 10:45:10] INFO: Accuracy: 0.925, Precision: 0.901, Recall: 0.887, F1: 0.894
+[2024-03-10 10:45:12] INFO: Evaluation task eval-bert-sentiment-001 finished successfully.
+</pre>
+                        </div>
+                    </div>
+                    <div id="tab-content-config" class="hidden">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">配置详情</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-sm">
+                            <div>
+                                <span class="font-medium text-gray-700">模型名称:</span>
+                                <p class="text-gray-600">bert-base-uncased</p>
+                            </div>
+                            <div>
+                                <span class="font-medium text-gray-700">评估框架:</span>
+                                <p class="text-gray-600">Hugging Face Transformers</p>
+                            </div>
+                            <div>
+                                <span class="font-medium text-gray-700">数据集路径:</span>
+                                <p class="text-gray-600">/data/imdb_reviews.jsonl</p>
+                            </div>
+                            <div>
+                                <span class="font-medium text-gray-700">评估指标:</span>
+                                <p class="text-gray-600">Accuracy, Precision, Recall, F1-score, AUC-ROC</p>
+                            </div>
+                            <div>
+                                <span class="font-medium text-gray-700">批处理大小 (Batch Size):</span>
+                                <p class="text-gray-600">32</p>
+                            </div>
+                            <div>
+                                <span class="font-medium text-gray-700">最大序列长度:</span>
+                                <p class="text-gray-600">256</p>
+                            </div>
+                            <div>
+                                <span class="font-medium text-gray-700">GPU 使用:</span>
+                                <p class="text-gray-600">Tesla V100 (1x)</p>
+                            </div>
+                            <div>
+                                <span class="font-medium text-gray-700">随机种子:</span>
+                                <p class="text-gray-600">42</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="tab-content-chart" class="hidden">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">可视化图表</h3>
+                        <div class="text-gray-500 text-sm">此处可放置模型评估相关的可视化图表。</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer class="bg-slate-800 text-slate-400 text-center py-6">
+            <p>© 2025 大模型安全检测平台. All rights reserved.</p>
+        </footer>
+    </div>
+    <script>
+        // Tab 切换逻辑（只保留一套，且与内容区一一对应）
+        const tabIds = ['log', 'config', 'chart'];
+        tabIds.forEach(id => {
+            document.getElementById('tab-' + id).addEventListener('click', function (e) {
+                e.preventDefault();
+                // 切换tab样式
+                tabIds.forEach(tid => {
+                    const tab = document.getElementById('tab-' + tid);
+                    if (tid === id) {
+                        tab.classList.add('border-blue-600', 'text-blue-600');
+                        tab.classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+                    } else {
+                        tab.classList.remove('border-blue-600', 'text-blue-600');
+                        tab.classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+                    }
+                });
+                // 切换内容区
+                tabIds.forEach(tid => {
+                    const content = document.getElementById('tab-content-' + tid);
+                    if (tid === id) {
+                        content.classList.remove('hidden');
+                    } else {
+                        content.classList.add('hidden');
+                    }
+                });
+            });
+        });
+        // Mobile menu toggle
+        const mobileMenuButton = document.querySelector('[aria-controls="mobile-menu"]');
+        const mobileMenu = document.getElementById('mobile-menu');
+        if (mobileMenuButton && mobileMenu) {
+            mobileMenuButton.addEventListener('click', () => {
+                const expanded = mobileMenuButton.getAttribute('aria-expanded') === 'true' || false;
+                mobileMenuButton.setAttribute('aria-expanded', !expanded);
+                mobileMenu.classList.toggle('hidden');
+                mobileMenu.classList.toggle('block');
+            });
+        }
+    </script>
+
+</body>
+
+</html>
