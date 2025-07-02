@@ -4,10 +4,12 @@
     size="small"
     effect="plain"
     disable-transitions
-    style="border-radius: 999px; display: inline-flex; align-items: center; font-weight: 500;"
+    style="border-radius: 999px; display: inline-flex; align-items: center; font-weight: 500; height: 32px; line-height: 32px; padding: 0 12px;"
   >
-    <span v-if="icon" class="material-icons-outlined" :style="iconStyle">{{ icon }}</span>
-    {{ text }}
+    <span style="display: flex; align-items: center;">
+      <span v-if="icon" class="material-icons-outlined" :style="iconStyle">{{ icon }}</span>
+      <span style="margin-left: 4px;">{{ text }}</span>
+    </span>
   </el-tag>
 </template>
 
