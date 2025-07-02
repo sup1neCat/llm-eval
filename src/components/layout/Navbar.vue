@@ -35,7 +35,7 @@ import { computed } from 'vue'
 const route = useRoute()
 
 const navItems = [
-  { name: '首页', path: '/index' },
+  { name: '首页', path: '/test-platform' },
   { name: '数据集', path: '/datasets' },
   { name: '排行榜', path: '/leaderboard' },
   { name: '数据异变', path: '/data-mutation' },

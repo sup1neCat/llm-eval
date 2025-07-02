@@ -9,10 +9,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@element-plus/icons-vue": "^2.3.1",
     "@material-design-icons/font": "^0.14.13",
     "element-plus": "^2.10.2",
     "vue": "^3.4.15",
-    "vue-router": "^4.2.5"
+    "vue-router": "^4.2.5",
+    "axios": "^1.6.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.3",
