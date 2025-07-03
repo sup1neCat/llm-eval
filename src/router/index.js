@@ -28,7 +28,7 @@ const routes = [
   {
     path: '/history',
     name: 'History',
-    component: () => import('../views/History.vue')
+    component: () => import('../views/HistoryPage.vue')
   },
   {
     path: '/task/:id',
@@ -38,7 +38,12 @@ const routes = [
   {
     path: '/report/:id',
     name: 'BackdoorReport',
-    component: () => import('../views/BackdoorReport.vue')
+    component: () => import('../views/BackdoorDetailPage.vue')
+  },
+  {
+    path: '/evaluation/create',
+    name: 'EvaluationCreation',
+    component: () => import('../views/EvaluationCreationPage.vue')
   }
 ]
 
