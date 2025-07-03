@@ -1,5 +1,7 @@
 ---
-alwaysApply: true
+description: 
+globs: 
+alwaysApply: false
 ---
 ### 项目规则
 
