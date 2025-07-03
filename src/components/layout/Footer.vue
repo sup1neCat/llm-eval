@@ -1,6 +1,6 @@
 <template>
-  <el-footer height="56px" style="background: #1e293b; color: #cfd3dc; text-align: center; padding: 0;">
-    <p style="margin: 0; line-height: 56px;">
+  <el-footer height="40px" style="background: #1e293b; color: #cfd3dc; text-align: center; padding: 0;">
+    <p style="margin: 0; line-height: 40px; font-size: 12px;">
       © {{ currentYear }} 大模型安全检测平台. All rights reserved.
     </p>
   </el-footer>
