@@ -64,12 +64,16 @@
       </el-card>
     </div>
   </div>
+  <router-view />
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
 import StatusBadge from '../components/common/StatusBadge.vue'
 import { View, Document, Warning, Loading, Promotion, Search, Plus } from '@element-plus/icons-vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 // 模拟数据
 const tasks = [
@@ -166,8 +170,7 @@ const getTaskActionText = (task) => {
 }
 
 const createNewTask = () => {
-  // TODO: 实现创建新任务逻辑
-  alert('创建新任务功能开发中...')
+  router.push('/history/createTask')
 }
 
 const getActionType = (task) => {

@@ -13,7 +13,14 @@ const routes = [
   {
     path: '/test-platform',
     name: 'TestPlatform',
-    component: () => import('../views/TestPlatform.vue')
+    component: () => import('../views/TestPlatform.vue'),
+    children: [
+      {
+        path: 'createTask',
+        name: 'TestPlatformCreateTask',
+        component: () => import('../views/CreateTask.vue')
+      }
+    ]
   },
   {
     path: '/leaderboard',
@@ -28,7 +35,14 @@ const routes = [
   {
     path: '/history',
     name: 'History',
-    component: () => import('../views/History.vue')
+    component: () => import('../views/History.vue'),
+    children: [
+      {
+        path: 'createTask',
+        name: 'HistoryCreateTask',
+        component: () => import('../views/CreateTask.vue')
+      }
+    ]
   },
   {
     path: '/task/:id',
