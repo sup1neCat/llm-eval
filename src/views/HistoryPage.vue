@@ -34,123 +34,115 @@
             创建新任务
           </el-button>
         </div>
-        <el-table :data="pagedTasks" border style="width: 100%;" table-layout="fixed">
-          <el-table-column prop="id" label="任务ID" width="160" />
-          <el-table-column prop="modelName" label="模型名称" width="200" />
-          <el-table-column prop="type" label="测评类型" width="160" />
-          <el-table-column prop="submitTime" label="提交时间" width="200" />
-          <el-table-column label="状态" width="180" align="center">
-            <template #default="scope">
-              <StatusBadge :status="scope.row.status" />
+        <template v-if="loading">
+          <LoadingSpinner text="正在加载任务列表..." />
             </template>
-          </el-table-column>
-          <el-table-column label="操作" width="140">
-            <template #default="scope">
-              <router-link :to="getTaskLink(scope.row)" style="display: flex; align-items: center; text-decoration: none;">
+        <template v-else>
+          <TaskList
+            :tasks="pagedTasks"
+            :current-page="currentPage"
+            :page-size="itemsPerPage"
+            :total="filteredTasks.length"
+            @page-change="handlePageChange"
+          >
+            <template #action="{ task }">
+              <router-link :to="getTaskLink(task)" style="display: flex; align-items: center; text-decoration: none;">
                 <el-link
-                  :type="getActionType(scope.row)"
+                  :type="getActionType(task)"
                   :underline="false"
                   style="display: flex; align-items: center; font-weight: 500; padding: 0;"
                 >
                   <el-icon style="margin-right: 4px;">
-                    <component :is="getActionIcon(scope.row)" />
+                    <component :is="getActionIcon(task)" />
                   </el-icon>
-                  {{ getTaskActionText(scope.row) }}
+                  {{ getTaskActionText(task) }}
                 </el-link>
               </router-link>
             </template>
-          </el-table-column>
-        </el-table>
+          </TaskList>
+        </template>
       </el-card>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import StatusBadge from '../components/common/StatusBadge.vue'
-import { View, Document, Warning, Loading, Promotion, Search, Plus } from '@element-plus/icons-vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { useRouter } from 'vue-router'
+import LoadingSpinner from '../components/common/LoadingSpinner.vue'
+import { View, Warning, Loading, Promotion, Search, Plus } from '@element-plus/icons-vue'
+import { fetchEvaluationHistory } from '../apis/evaluation'
+import { ElMessage } from 'element-plus'
+import TaskList from '../components/common/TaskList.vue'
 
-// 模拟数据
-const tasks = [
-  {
-    id: 'eval-task-67890',
-    modelName: 'Model-X v1.0',
-    type: '后门检测',
-    submitTime: '2023-10-27 15:30',
-    status: 'completed-danger'
-  },
-  {
-    id: 'eval-task-67891',
-    modelName: 'SecureLLM-Alpha',
-    type: '后门检测',
-    submitTime: '2023-10-28 10:15',
-    status: 'completed-safe'
-  },
-  {
-    id: 'eval-task-67892',
-    modelName: 'CodeGuardian',
-    type: '代码能力',
-    submitTime: '2023-10-29 09:00',
-    status: 'running'
-  },
-  {
-    id: 'eval-task-67893',
-    modelName: 'ChatBot-Plus',
-    type: '对话能力',
-    submitTime: '2023-10-29 11:30',
-    status: 'pending'
-  },
-  {
-    id: 'eval-task-67894',
-    modelName: 'TranslatePro',
-    type: '翻译能力',
-    submitTime: '2023-10-29 14:00',
-    status: 'failed'
-  }
-]
-
+const router = useRouter()
 const searchQuery = ref('')
 const statusFilter = ref('')
 const currentPage = ref(1)
 const itemsPerPage = 10
+const totalItems = ref(0)
+const tasks = ref([])
+const loading = ref(false)
+const pollingTimer = ref(null)
 
-const filteredTasks = computed(() => {
-  return tasks.filter(task => {
-    const matchesSearch = searchQuery.value === '' ||
-      task.id.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      task.modelName.toLowerCase().includes(searchQuery.value.toLowerCase())
-    const matchesStatus = statusFilter.value === '' || statusFilter.value == null || task.status === statusFilter.value
-    return matchesSearch && matchesStatus
-  })
+const loadTasks = async () => {
+  loading.value = true
+  try {
+    const params = {
+      page: currentPage.value,
+      pageSize: itemsPerPage,
+      search: searchQuery.value,
+      status: statusFilter.value
+    }
+    const res = await fetchEvaluationHistory(params)
+    tasks.value = res.data || res.tasks || []
+    totalItems.value = res.total || res.totalCount || 0
+  } catch (e) {
+    ElMessage.error('获取任务列表失败')
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  loadTasks()
+  pollingTimer.value = setInterval(() => {
+    // 只在有进行中/等待中任务时轮询
+    if (tasks.value.some(t => t.status === 'pending' || t.status === 'running')) {
+      loadTasks()
+    }
+  }, 8000)
 })
-
-const pagedTasks = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage
-  return filteredTasks.value.slice(start, start + itemsPerPage)
+onUnmounted(() => {
+  if (pollingTimer.value) clearInterval(pollingTimer.value)
 })
 
 const handlePageChange = (page) => {
   currentPage.value = page
+  loadTasks()
 }
+
+const filteredTasks = computed(() => {
+  return tasks.value.filter(task => {
+    const id = task.id || task.task_id || ''
+    const modelName = task.modelName || task.model_name || ''
+    const matchesSearch = !searchQuery.value ||
+      id.includes(searchQuery.value) ||
+      modelName.includes(searchQuery.value)
+    const matchesStatus = !statusFilter.value || task.status === statusFilter.value
+    return matchesSearch && matchesStatus
+  })
+})
+const pagedTasks = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage
+  return filteredTasks.value.slice(start, start + itemsPerPage)
+})
 
 const getTaskLink = (task) => {
   if (task.status === 'completed-danger' || task.status === 'completed-safe') {
     return `/report/${task.id}`
   }
   return `/task/${task.id}`
-}
-
-const getTaskIcon = (task) => {
-  if (task.status === 'completed-danger' || task.status === 'completed-safe') {
-    return 'visibility'
-  } else if (task.status === 'failed') {
-    return 'report_problem'
-  } else if (task.status === 'running') {
-    return 'hourglass_empty'
-  } else {
-    return 'play_arrow'
-  }
 }
 
 const getTaskActionText = (task) => {
@@ -166,8 +158,7 @@ const getTaskActionText = (task) => {
 }
 
 const createNewTask = () => {
-  // TODO: 实现创建新任务逻辑
-  alert('创建新任务功能开发中...')
+  router.push('/evaluation/create')
 }
 
 const getActionType = (task) => {
