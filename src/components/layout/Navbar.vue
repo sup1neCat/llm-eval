@@ -1,6 +1,6 @@
 <template>
   <el-header height="64px" style="background: #1e293b; color: #fff; box-shadow: 0 2px 8px 0 rgba(0,0,0,0.04); padding: 0;">
-    <div style="max-width: 1400px; margin: 0 auto; display: flex; align-items: center; height: 100%; justify-content: space-between; padding: 0 16px;">
+    <div style="max-width: 1650px; margin: 0 auto; display: flex; align-items: center; height: 100%; justify-content: space-between; padding: 0 14px;">
       <div style="display: flex; align-items: center; width: 100%;">
         <router-link to="/" style="font-size: 1.3rem; font-weight: bold; color: #fff; text-decoration: none; margin-right: 24px;">
           大模型安全检测平台
@@ -16,13 +16,13 @@
           </el-menu>
         </div>
       </div>
-      <div style="display: flex; align-items: center;">
-        <el-badge is-dot style="margin-right: 16px;">
+      <div style="display: flex; align-items: center; margin-right: 16px;">
+        <el-badge is-dot style="margin-right: 14px;">
           <el-button circle size="large" style="background: transparent; color: #fff; border: none;">
             <span class="material-icons">notifications</span>
           </el-button>
         </el-badge>
-        <el-avatar size="large" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAsvTqTh8m_w349kBvPZdi6MjJBMex5ZQ862zE8XRA7nrnCCuctC5c6VOfitsjj5yImyfLFdz3VtTzqiopr-lGY7ksgGP7VD4ymMoZ-TTk9JkZN4gjL5s5Oh7l6lmpbS-MET_6u8flRKgI_7MgZHCMoI3mN128MJy6crYDMDZxPbPPuMsAzdUlYBaZ15CIlTfcuYKtiO3EpmWjPNUq5Ev0iROEG7ioobPwIUw-hnedbrmq_lGk8GT25UNdbQPKWK-eGqS-kwYlCRXs" />
+        <el-avatar size="medium" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAsvTqTh8m_w349kBvPZdi6MjJBMex5ZQ862zE8XRA7nrnCCuctC5c6VOfitsjj5yImyfLFdz3VtTzqiopr-lGY7ksgGP7VD4ymMoZ-TTk9JkZN4gjL5s5Oh7l6lmpbS-MET_6u8flRKgI_7MgZHCMoI3mN128MJy6crYDMDZxPbPPuMsAzdUlYBaZ15CIlTfcuYKtiO3EpmWjPNUq5Ev0iROEG7ioobPwIUw-hnedbrmq_lGk8GT25UNdbQPKWK-eGqS-kwYlCRXs" />
       </div>
     </div>
   </el-header>
