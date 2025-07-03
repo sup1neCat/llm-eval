@@ -11,14 +11,6 @@ export const METRIC_LABELS = {
   // ...如有新指标可补充
 }
 
-// 获取后门检测报告
-export const fetchBackdoorReport = async (taskId) => {
-  const { data } = await axios.get('/api/v1/detect/backdoor/result', {
-    params: { task_id: taskId }
-  })
-  return data
-}
-
 // 启动后门检测任务
 export const startBackdoorDetection = async ({ task_id, model_identifier, dataset_path, callback_url }) => {
   const { data, status } = await axios.post('/api/v1/detect/backdoor', {
