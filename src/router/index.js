@@ -66,6 +66,11 @@ const routes = [
     path: '/evaluation/create',
     name: 'EvaluationCreation',
     component: () => import('../views/EvaluationCreationPage.vue')
+  },
+  {
+    path: '/flames-report/:id',
+    name: 'FlamesReport',
+    component: () => import('../views/FlamesReport.vue')
   }
 ]
 
