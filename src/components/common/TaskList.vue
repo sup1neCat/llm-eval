@@ -6,7 +6,10 @@
     <el-table-column prop="submitTime" label="提交时间" width="200" />
     <el-table-column label="状态" width="180" align="center">
       <template #default="scope">
-        <StatusIndicator :status="scope.row.status" />
+        <StatusIndicator 
+          :status="scope.row.status" 
+          :ability-name="scope.row.abilityName || scope.row.ability_name || ''" 
+        />
       </template>
     </el-table-column>
     <el-table-column label="操作" width="140">
