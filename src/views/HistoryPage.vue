@@ -64,18 +64,16 @@
       </el-card>
     </div>
   </div>
+  <router-view />
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { ref, computed } from 'vue'
+import { View, Document, Warning, Loading, Promotion, Search, Plus } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
-import LoadingSpinner from '../components/common/LoadingSpinner.vue'
-import { View, Warning, Loading, Promotion, Search, Plus } from '@element-plus/icons-vue'
-import { fetchEvaluationHistory } from '../apis/evaluation'
-import { ElMessage } from 'element-plus'
-import TaskList from '../components/common/TaskList.vue'
 
 const router = useRouter()
+
 const searchQuery = ref('')
 const statusFilter = ref('')
 const currentPage = ref(1)
@@ -158,7 +156,7 @@ const getTaskActionText = (task) => {
 }
 
 const createNewTask = () => {
-  router.push('/evaluation/create')
+  router.push('/history/createTask')
 }
 
 const getActionType = (task) => {
