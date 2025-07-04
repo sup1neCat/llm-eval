@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>人工智能安全检测平台 - 数据集</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: "微软雅黑", Arial, sans-serif;
+            background: #f7fafd;
+        }
+        .navbar {
+            background: #18344b;
+            color: #fff;
+            padding: 0 40px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .navbar-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-right: 40px;
+        }
+        .navbar-menu {
+            display: flex;
+            gap: 30px;
+            flex: 1;
+        }
+        .navbar-menu a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 16px;
+            line-height: 56px;
+        }
+        .navbar-user {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #e0e6ed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 30px auto 0 auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            padding: 32px 40px 40px 40px;
+        }
+        .page-title {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .page-desc {
+            color: #666;
+            font-size: 15px;
+            margin-bottom: 30px;
+        }
+        .main-content {
+            display: flex;
+            gap: 40px;
+        }
+        .sidebar {
+            min-width: 180px;
+        }
+        .sidebar-group {
+            margin-bottom: 24px;
+        }
+        .sidebar-group-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #18344b;
+        }
+        .tag {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 13px;
+            margin: 2px 6px 6px 0;
+            background: #e6f7ff;
+            color: #1890ff;
+        }
+        .tag.green { background: #e6fffb; color: #13c2c2; }
+        .tag.blue { background: #e6f7ff; color: #1890ff; }
+        .tag.red { background: #fff1f0; color: #f5222d; }
+        .tag.purple { background: #f9f0ff; color: #722ed1; }
+        .tag.gray { background: #f5f5f5; color: #888; }
+        .datasets-section {
+            flex: 1;
+        }
+        .datasets-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+        .datasets-header-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .datasets-header-count {
+            color: #888;
+            font-size: 14px;
+        }
+        /* 响应式卡片布局 */
+        .datasets-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+        @media (max-width: 900px) {
+            .datasets-list {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 600px) {
+            .main-content {
+                flex-direction: column;
+            }
+            .datasets-list {
+                grid-template-columns: 1fr;
+            }
+            .container {
+                padding: 16px 8px 24px 8px;
+            }
+        }
+        .dataset-card {
+            background: #fafbfc;
+            border: 1px solid #e6e6e6;
+            border-radius: 8px;
+            padding: 18px 20px 16px 20px;
+            box-sizing: border-box;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+        }
+        .dataset-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .dataset-tags {
+            margin-bottom: 10px;
+        }
+        .dataset-desc {
+            color: #666;
+            font-size: 14px;
+            min-height: 40px;
+        }
+        /* 美化大模型评估树状结构 */
+        #eval-tree .eval-section {
+            margin-bottom: 0;
+        }
+        .eval-list {
+            list-style: none;
+            padding-left: 12px;
+            margin: 0;
+            border-left: 2px solid #e6e6e6;
+        }
+        .eval-leaf {
+            margin: 0 0 6px 0;
+            padding: 6px 14px 6px 18px;
+            border-radius: 16px 0 0 16px;
+            cursor: pointer;
+            color: #333;
+            position: relative;
+            transition: background 0.2s, color 0.2s;
+        }
+        .eval-leaf:hover {
+            background: #e6f7ff;
+            color: #1890ff;
+        }
+        .eval-leaf.selected {
+            background: linear-gradient(90deg,#1890ff 0,#e6f7ff 100%);
+            color: #fff;
+            font-weight: bold;
+        }
+        .test-center-wrap {
+            display: flex;
+            justify-content: center;
+            margin-top: 24px;
+        }
+        .test-main-card {
+            width: 100%;
+            max-width: 680px;
+            background: #fff;
+            border-radius: 8px;
+            padding: 24px 28px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+            box-sizing: border-box;
+        }
+        @media (max-width: 800px) {
+            .test-main-card {
+                max-width: 98vw;
+                padding: 16px 4vw;
+            }
+        }
+        @media (max-width: 600px) {
+            .test-main-card {
+                max-width: 100vw;
+                padding: 8px 2vw;
+            }
+        }
+        /* 新增：三段式进度条样式 */
+        .step-progress-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin: 0 auto;
+            height: 18px;
+            position: relative;
+            margin-bottom: 8px;
+        }
+        .step-segment {
+            flex: 1;
+            height: 12px;
+            margin: 0 4px;
+            border-radius: 8px;
+            background: #e0e6ed;
+            position: relative;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .step-segment span {
+            position: absolute;
+            top: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 15px;
+            font-weight: bold;
+            color: #888;
+            z-index: 2;
+        }
+        .step-segment.active {
+            background: linear-gradient(90deg,#14407a 0%,#1890ff 100%);
+            box-shadow: 0 2px 8px rgba(24,144,255,0.12);
+        }
+        .step-segment.active span {
+            color: #1890ff;
+        }
+        .step-segment.done {
+            background: #1890ff;
+        }
+        /* 新增：测试类型按钮样式 */
+        .test-type-btn {
+            background: #fff;
+            color: #18344b;
+            border: 2px solid #1890ff;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 500;
+            padding: 18px 44px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(24,144,255,0.06);
+        }
+        .test-type-btn.selected, .test-type-btn:hover {
+            background: linear-gradient(90deg,#14407a 0%,#1890ff 100%);
+            color: #fff;
+            border-color: #14407a;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="navbar-title">大模型安全检测平台</div>
+        <div class="navbar-menu">
+            <a href="#" data-page="datasets">数据集</a>
+            <a href="#" data-page="test">测试平台</a>
+            <a href="#" data-page="rank">排行榜</a>
+            <a href="#" data-page="mutation">数据异变</a>
+            <a href="#" data-page="history">历史记录</a>
+        </div>
+        <div class="navbar-user">
+            <span>⚙️</span>
+        </div>
+    </div>
+    <div class="container">
+        <div id="page-datasets" class="page-section">
+            <div class="page-title">数据集</div>
+            <div class="page-desc">
+                本部分展示了系统中集成的相关数据集，这些数据集可用于各种任务。
+            </div>
+            <div class="main-content">
+                <div class="sidebar">
+                    <div class="sidebar-group" id="eval-tree">
+                        <div class="sidebar-group-title" style="font-size:16px;margin-bottom:18px;">大模型评估</div>
+                        <div class="eval-section">
+                            <div class="eval-main" style="color:#1890ff;font-weight:bold;margin-bottom:8px;">能力评估</div>
+                            <ul class="eval-list">
+                                <li class="eval-leaf" data-ability="推理能力">推理能力</li>
+                                <li class="eval-leaf" data-ability="代码能力">代码能力</li>
+                                <li class="eval-leaf" data-ability="理解能力">理解能力</li>
+                                <li class="eval-leaf" data-ability="对话能力">对话能力</li>
+                                <li class="eval-leaf" data-ability="翻译能力">翻译能力</li>
+                            </ul>
+                        </div>
+                        <div class="eval-section">
+                            <div class="eval-main" style="color:#faad14;font-weight:bold;margin:18px 0 8px 0;">对齐评估</div>
+                            <ul class="eval-list">
+                                <li class="eval-leaf" data-ability="道德性">道德性</li>
+                                <li class="eval-leaf" data-ability="公平性">公平性</li>
+                                <li class="eval-leaf" data-ability="毒性">毒性</li>
+                                <li class="eval-leaf" data-ability="幻觉">幻觉</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="datasets-section">
+                    <div class="datasets-header">
+                        <div class="datasets-header-title">数据集列表</div>
+                        <div class="datasets-header-count">共 3 个</div>
+                    </div>
+                    <div class="datasets-list">
+                        <div class="dataset-card">
+                            <div class="dataset-title">CelebA-HQ</div>
+                            <div class="dataset-tags">
+                                <span class="tag red">图像分类</span>
+                                <span class="tag blue">图像完整性检测</span>
+                            </div>
+                            <div class="dataset-desc">
+                                CelebA是面向人脸分析的高分辨率大规模人脸数据集，包含10177个人物和20多万张高质量人脸图像，适用于多种任务。
+                            </div>
+                        </div>
+                        <div class="dataset-card">
+                            <div class="dataset-title">COCO</div>
+                            <div class="dataset-tags">
+                                <span class="tag green">目标检测</span>
+                                <span class="tag blue">目标检测评估</span>
+                            </div>
+                            <div class="dataset-desc">
+                                COCO数据集是一个用于目标检测（image detection）、语义分割（semantic segmentation）和图像描述（image captioning）的数据集。
+                            </div>
+                        </div>
+                        <div class="dataset-card">
+                            <div class="dataset-title">PASCAL VOC</div>
+                            <div class="dataset-tags">
+                                <span class="tag green">目标检测</span>
+                                <span class="tag blue">目标检测评估</span>
+                            </div>
+                            <div class="dataset-desc">
+                                PASCAL VOC（Pattern Analysis, Statistical Modeling and Computational Learning Visual Object Classes）数据集是一个广泛使用的目标检测数据集。
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="page-test" class="page-section" style="display:none">
+            <div class="page-title">测试平台</div>
+            <div class="page-desc">在此平台上，您可以对大模型进行安全性、鲁棒性等多维度的自动化测试。</div>
+            <!-- 新增：三选一按钮区 -->
+            <div id="test-type-select" style="display:flex;gap:32px;justify-content:center;margin:36px 0 40px 0;">
+                <button class="test-type-btn" data-type="jailbreak">越狱攻击检测</button>
+                <button class="test-type-btn" data-type="backdoor">后门攻击检测</button>
+                <button class="test-type-btn" data-type="general">通用大模型测评</button>
+            </div>
+            <div class="test-center-wrap" id="test-main-wrap" style="display:none;max-width:1200px;margin:0 auto;">
+                <!-- 步骤进度条和指示 -->
+                <div style="margin-bottom:40px;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                        <div style="font-weight:bold;font-size:20px;letter-spacing:1px;">测试流程</div>
+                        <div id="test-step-label" style="color:#888;font-size:16px;">步骤 1 / 3</div>
+                    </div>
+                    <!-- 新三段式进度条 -->
+                    <div class="step-progress-bar">
+                        <div class="step-segment" id="step-seg-1"><span>1</span></div>
+                        <div class="step-segment" id="step-seg-2"><span>2</span></div>
+                        <div class="step-segment" id="step-seg-3"><span>3</span></div>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;margin-top:10px;font-size:16px;color:#888;">
+                        <span id="step-label-1" style="color:#1890ff;font-weight:bold;">上传模型</span>
+                        <span id="step-label-2">启动测试</span>
+                        <span id="step-label-3">结果查询</span>
+                    </div>
+                </div>
+                <!-- 步骤一：上传模型及参数配置 -->
+                <div id="test-step-1" class="test-step-panel" style="max-width:900px;margin:0 auto 48px auto;">
+                    <div style="font-size:20px;font-weight:bold;margin-bottom:32px;">上传模型</div>
+                    <div style="background:#f8fafc;border-radius:12px;padding:40px 48px 32px 48px;box-shadow:0 2px 8px rgba(24,144,255,0.03);margin-bottom:40px;display:flex;gap:48px;">
+                        <div style="flex:1;min-width:260px;">
+                            <div style="font-weight:500;margin-bottom:10px;">模型名称</div>
+                            <input type="text" placeholder="请输入模型名称" style="width:100%;padding:12px 14px;border-radius:6px;border:1px solid #b5d3f3;font-size:16px;margin-bottom:24px;background:#fff;" />
+                            <div style="font-weight:500;margin-bottom:10px;">API</div>
+                            <input type="text" placeholder="请输入API地址" style="width:100%;padding:12px 14px;border-radius:6px;border:1px solid #b5d3f3;font-size:16px;margin-bottom:24px;background:#fff;" />
+                            <div style="font-weight:500;margin-bottom:10px;">参数配置</div>
+                            <div style="display:flex;flex-direction:column;gap:18px;">
+                                <label>测试能力：<select style="margin-left:6px;"><option>无</option><option>FGSM</option><option>PGD</option></select></label>
+                                <label>模型参数调节：<input type="number" value="0.5" min="0" max="1" step="0.01" style="width:60px;margin-left:6px;"></label>
+                            </div>
+                        </div>
+                        <div style="flex:1;min-width:260px;">
+                            <div style="font-weight:500;margin-bottom:10px;">选择数据集</div>
+                            <select style="width:100%;padding:12px 14px;border-radius:6px;border:1px solid #b5d3f3;font-size:16px;margin-bottom:24px;background:#fff;">
+                                <option>COCO</option>
+                                <option>PASCAL VOC</option>
+                            </select>
+                            <div style="font-weight:500;margin-bottom:10px;">上传模型文件</div>
+                            <div style="border:2px dashed #b5d3f3;border-radius:8px;padding:32px;text-align:center;color:#888;margin-bottom:12px;background:#fff;">
+                                <span>拖拽文件到这里，或点击选择</span>
+                                <br><button style="margin-top:14px;background:#1890ff;color:#fff;border:none;border-radius:4px;padding:10px 24px;font-size:16px;cursor:pointer;">浏览</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="text-align:center;margin-top:18px;">
+                        <button id="test-next-1" style="background:#1890ff;color:#fff;border:none;border-radius:6px;padding:12px 56px;font-size:18px;cursor:pointer;">下一步</button>
+                    </div>
+                </div>
+                <!-- 步骤二：启动测试 -->
+                <div id="test-step-2" class="test-step-panel" style="max-width:900px;margin:0 auto 48px auto;">
+                    <div style="font-size:20px;font-weight:bold;margin-bottom:32px;">启动测试</div>
+                    <div style="display:flex;gap:48px;margin-bottom:40px;">
+                        <div style="flex:1;min-width:320px;">
+                            <div style="font-weight:500;margin-bottom:12px;">实时运行信息</div>
+                            <div style="background:#23272e;color:#e6e6e6;font-family:monospace,Consolas,Menlo,monaco,monospace;font-size:15px;border-radius:8px;padding:24px 20px;min-height:120px;box-shadow:0 2px 8px rgba(24,144,255,0.06);">
+                                问题 12: 这是一个测试问题。\n结果：正确\n...\n[运行中...]
+                            </div>
+                        </div>
+                        <div style="flex:1;min-width:260px;">
+                            <div style="font-weight:500;margin-bottom:12px;">测评信息</div>
+                            <div style="background:#f8fafc;border-radius:8px;padding:24px 20px;box-shadow:0 2px 8px rgba(24,144,255,0.03);">
+                                <div style="color:#666;font-size:15px;margin-bottom:10px;">模型名称：模型 B</div>
+                                <div style="color:#666;font-size:15px;margin-bottom:10px;">测试类型：全面测试</div>
+                                <div style="color:#666;font-size:15px;">开始时间：2024-01-01 10:00</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-bottom:40px;">
+                        <div style="font-weight:500;margin-bottom:12px;">测试进度</div>
+                        <div style="background:#e5eaf3;border-radius:6px;height:16px;width:100%;overflow:hidden;position:relative;">
+                            <div id="test-progress-bar" style="background:#1890ff;height:100%;width:60%;transition:width 0.5s;border-radius:6px;"></div>
+                            <span id="test-progress-text" style="position:absolute;right:18px;top:-28px;font-size:15px;color:#1890ff;font-weight:bold;">60%</span>
+                        </div>
+                        <div style="color:#888;font-size:15px;margin-top:8px;">测试进度：37%</div>
+                    </div>
+                    <div style="text-align:center;margin-top:18px;">
+                        <button id="test-prev-2" style="background:#e0e6ed;color:#18344b;border:none;border-radius:6px;padding:12px 44px;font-size:17px;cursor:pointer;margin-right:24px;">上一步</button>
+                        <button id="test-next-2" style="background:#1890ff;color:#fff;border:none;border-radius:6px;padding:12px 56px;font-size:18px;cursor:pointer;">下一步</button>
+                    </div>
+                </div>
+                <!-- 步骤三：结果查询 -->
+                <div id="test-step-3" class="test-step-panel" style="max-width:900px;margin:0 auto 48px auto;">
+                    <div style="font-size:20px;font-weight:bold;margin-bottom:32px;">结果查询</div>
+                    <div style="background:#f8fafc;border-radius:12px;padding:40px 48px 32px 48px;box-shadow:0 2px 8px rgba(24,144,255,0.03);margin-bottom:40px;display:flex;flex-direction:column;gap:32px;">
+                        <div>
+                            <div style="font-weight:500;margin-bottom:12px;">基本信息</div>
+                            <div style="display:flex;flex-direction:column;gap:10px;">
+                                <div style="color:#666;font-size:16px;">测试名称：模型性能评测</div>
+                                <div style="color:#666;font-size:16px;">测试时间：2024-01-15 14:30</div>
+                                <div style="color:#666;font-size:16px;">模型名称：Model-X</div>
+                                <div style="color:#666;font-size:16px;">数据集名称：Dataset-A</div>
+                            </div>
+                        </div>
+                        <div>
+                            <div style="font-weight:500;margin-bottom:12px;">关键指标</div>
+                            <div style="display:flex;gap:24px;flex-wrap:wrap;">
+                                <div style="background:#fff;border:1px solid #e5eaf3;border-radius:8px;padding:18px 28px;min-width:120px;box-shadow:0 1px 4px rgba(24,144,255,0.03);display:flex;flex-direction:column;align-items:center;">
+                                    <div style="color:#222;font-size:22px;font-weight:bold;letter-spacing:1px;">95.2%</div>
+                                    <div style="color:#888;font-size:15px;margin-top:4px;">准确率</div>
+                                </div>
+                                <div style="background:#fff;border:1px solid #e5eaf3;border-radius:8px;padding:18px 28px;min-width:120px;box-shadow:0 1px 4px rgba(24,144,255,0.03);display:flex;flex-direction:column;align-items:center;">
+                                    <div style="color:#222;font-size:22px;font-weight:bold;letter-spacing:1px;">94.8%</div>
+                                    <div style="color:#888;font-size:15px;margin-top:4px;">精度</div>
+                                </div>
+                                <div style="background:#fff;border:1px solid #e5eaf3;border-radius:8px;padding:18px 28px;min-width:120px;box-shadow:0 1px 4px rgba(24,144,255,0.03);display:flex;flex-direction:column;align-items:center;">
+                                    <div style="color:#222;font-size:22px;font-weight:bold;letter-spacing:1px;">96.1%</div>
+                                    <div style="color:#888;font-size:15px;margin-top:4px;">召回率</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div style="font-weight:500;margin-bottom:12px;">性能排行榜</div>
+                            <canvas id="barChart" width="600" height="200" style="margin-bottom:10px;"></canvas>
+                            <div style="text-align:right;margin-top:10px;">
+                                <button style="background:#1890ff;color:#fff;border:none;border-radius:4px;padding:8px 22px;font-size:16px;cursor:pointer;">下载完整报告</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="text-align:center;margin-top:18px;">
+                        <button id="test-prev-3" style="background:#e0e6ed;color:#18344b;border:none;border-radius:6px;padding:12px 44px;font-size:17px;cursor:pointer;margin-right:24px;">上一步</button>
+                        <button id="test-finish" style="background:#1890ff;color:#fff;border:none;border-radius:6px;padding:12px 56px;font-size:18px;cursor:pointer;">完成</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="page-rank" class="page-section" style="display:none">
+            <div class="page-title">排行榜</div>
+            <div class="page-desc">展示各类模型在不同安全测试维度下的综合评分，支持多维度筛选。</div>
+            <div style="margin:32px 0 0 0;display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap;">
+                <div style="background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(24,64,122,0.06);padding:28px 32px;min-width:340px;">
+                    <div style="font-weight:bold;margin-bottom:18px;font-size:18px;">模型综合能力雷达图</div>
+                    <canvas id="modelRadar" width="320" height="260"></canvas>
+                </div>
+                <div style="flex:1;min-width:420px;">
+                    <!-- 直接展示所有筛选选项，测试维度默认综合评分 -->
+                    <div id="rank-filter-bar" style="display:flex;align-items:center;gap:18px;margin-bottom:10px;flex-wrap:wrap;">
+                        <label>模型类型：<select><option>全部</option><option>分类模型</option><option>检测模型</option></select></label>
+                        <label>测试维度：<select><option selected>综合评分</option><option>鲁棒性</option><option>攻击成功率</option></select></label>
+                        <label>时间范围：<select><option>近一周</option><option>近一月</option><option>全部</option></select></label>
+                        <input type="text" placeholder="搜索模型名称..." style="padding:4px 10px;border-radius:4px;border:1px solid #d9d9d9;">
+                    </div>
+                    <!-- 综合评分表格 -->
+                    <table style="width:100%;border-collapse:separate;border-spacing:0 10px;background:transparent;">
+                        <thead>
+                            <tr style="color:#888;font-size:16px;background:transparent;">
+                                <th style="padding:8px 0;text-align:left;width:60px;">排名</th>
+                                <th style="padding:8px 0;text-align:left;">模型名称</th>
+                                <th style="padding:8px 0;text-align:left;">分数</th>
+                                <th style="padding:8px 0;text-align:left;">测试维度</th>
+                                <th style="padding:8px 0;text-align:left;">上传者</th>
+                                <th style="padding:8px 0;text-align:left;">测试时间</th>
+                                <th style="padding:8px 0;text-align:left;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="background:#fff;border-radius:8px;box-shadow:0 1px 6px rgba(24,64,122,0.04);font-size:17px;">
+                                <td style="font-weight:bold;color:#14407a;padding:12px 0 12px 0;text-align:left;">1</td>
+                                <td style="font-weight:500;">ResNet-50</td>
+                                <td style="color:#1890ff;font-weight:bold;font-size:18px;">98.2</td>
+                                <td>综合能力</td>
+                                <td>张三</td>
+                                <td>2024-06-01</td>
+                                <td><a href="#" style="color:#1890ff;">详情</a></td>
+                            </tr>
+                            <tr style="background:#fff;border-radius:8px;box-shadow:0 1px 6px rgba(24,64,122,0.04);font-size:17px;">
+                                <td style="font-weight:bold;color:#14407a;padding:12px 0 12px 0;text-align:left;">2</td>
+                                <td style="font-weight:500;">YOLOv5</td>
+                                <td style="color:#1890ff;font-weight:bold;font-size:18px;">95.7</td>
+                                <td>综合能力</td>
+                                <td>李四</td>
+                                <td>2024-05-28</td>
+                                <td><a href="#" style="color:#1890ff;">详情</a></td>
+                            </tr>
+                            <tr style="background:#fff;border-radius:8px;box-shadow:0 1px 6px rgba(24,64,122,0.04);font-size:17px;">
+                                <td style="font-weight:bold;color:#14407a;padding:12px 0 12px 0;text-align:left;">3</td>
+                                <td style="font-weight:500;">BERT</td>
+                                <td style="color:#1890ff;font-weight:bold;font-size:18px;">93.4</td>
+                                <td>综合能力</td>
+                                <td>王五</td>
+                                <td>2024-05-20</td>
+                                <td><a href="#" style="color:#1890ff;">详情</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script>
+            // 示例雷达图数据
+            const radarData = {
+                labels: ['推理能力', '代码能力', '理解能力', '对话能力', '翻译能力', '道德性', '公平性', '毒性', '幻觉'],
+                datasets: [
+                    {
+                        label: 'ResNet-50',
+                        data: [95, 80, 92, 70, 60, 85, 90, 95, 80],
+                        fill: true,
+                        backgroundColor: 'rgba(24,144,255,0.2)',
+                        borderColor: 'rgba(24,144,255,1)',
+                        pointBackgroundColor: 'rgba(24,144,255,1)',
+                    },
+                    {
+                        label: 'YOLOv5',
+                        data: [90, 85, 88, 65, 55, 80, 85, 90, 75],
+                        fill: true,
+                        backgroundColor: 'rgba(250,173,20,0.15)',
+                        borderColor: 'rgba(250,173,20,1)',
+                        pointBackgroundColor: 'rgba(250,173,20,1)',
+                    },
+                    {
+                        label: 'BERT',
+                        data: [80, 95, 98, 90, 85, 88, 92, 85, 90],
+                        fill: true,
+                        backgroundColor: 'rgba(82,196,26,0.15)',
+                        borderColor: 'rgba(82,196,26,1)',
+                        pointBackgroundColor: 'rgba(82,196,26,1)',
+                    }
+                ]
+            };
+            const radarConfig = {
+                type: 'radar',
+                data: radarData,
+                options: {
+                    responsive: false,
+                    plugins: {
+                        legend: { position: 'top' },
+                        title: { display: false }
+                    },
+                    scales: {
+                        r: {
+                            angleLines: { display: true },
+                            suggestedMin: 0,
+                            suggestedMax: 100,
+                            pointLabels: { font: { size: 14 } }
+                        }
+                    }
+                }
+            };
+            setTimeout(()=>{
+                const ctx = document.getElementById('modelRadar').getContext('2d');
+                window.modelRadarChart = new Chart(ctx, radarConfig);
+            }, 100);
+            </script>
+        </div>
+        <div id="page-mutation" class="page-section" style="display:none">
+            <div class="page-title">数据异变</div>
+            <div class="page-desc">支持对原始数据集进行多种异变操作（如扰动、攻击、增强等），用于测试模型的鲁棒性和安全性。</div>
+            <div style="display:flex;gap:32px;margin-top:24px;align-items:flex-start;flex-wrap:wrap;">
+                <!-- 左侧数据集选择 -->
+                <div style="min-width:220px;max-width:260px;width:25%;background:#f8fafc;border-radius:8px;padding:18px 12px 12px 12px;box-shadow:0 1px 4px rgba(0,0,0,0.03);">
+                    <div style="font-weight:bold;margin-bottom:10px;">数据集选择</div>
+                    <select style="width:100%;padding:6px 8px;border-radius:4px;border:1px solid #d9d9d9;">
+                        <option>COCO</option>
+                        <option>PASCAL VOC</option>
+                    </select>
+                    <div style="margin:12px 0 0 0;color:#1890ff;cursor:pointer;">+ 上传新数据集</div>
+                </div>
+                <!-- 中间异变配置 -->
+                <div style="flex:1;min-width:220px;max-width:340px;background:#fff;border-radius:8px;padding:18px 18px;box-shadow:0 1px 4px rgba(0,0,0,0.04);">
+                    <div style="font-weight:bold;margin-bottom:10px;">异变类型</div>
+                    <select style="width:100%;padding:6px 8px;border-radius:4px;border:1px solid #d9d9d9;">
+                        <option>高斯噪声</option>
+                        <option>遮挡</option>
+                        <option>对抗样本</option>
+                    </select>
+                    <div style="margin:14px 0 8px 0;font-size:14px;color:#888;">参数配置</div>
+                    <input type="number" placeholder="噪声强度" style="width:100%;padding:6px 8px;border-radius:4px;border:1px solid #d9d9d9;">
+                    <button style="margin-top:16px;background:#1890ff;color:#fff;border:none;border-radius:4px;padding:8px 18px;font-size:15px;cursor:pointer;width:100%;">生成异变数据</button>
+                </div>
+                <!-- 右侧对比预览 -->
+                <div style="flex:1;min-width:220px;max-width:340px;background:#fff;border-radius:8px;padding:18px 18px;box-shadow:0 1px 4px rgba(0,0,0,0.04);">
+                    <div style="font-weight:bold;margin-bottom:10px;">数据对比预览</div>
+                    <div style="display:flex;gap:10px;">
+                        <div style="flex:1;text-align:center;">
+                            <div style="color:#888;font-size:13px;">原始数据</div>
+                            <div style="background:#f5f5f5;height:80px;border-radius:6px;margin:6px 0;line-height:80px;">[图片/文本]</div>
+                        </div>
+                        <div style="flex:1;text-align:center;">
+                            <div style="color:#888;font-size:13px;">异变后</div>
+                            <div style="background:#f5f5f5;height:80px;border-radius:6px;margin:6px 0;line-height:80px;">[图片/文本]</div>
+                        </div>
+                    </div>
+                    <div style="margin-top:18px;font-size:14px;color:#888;">异变历史</div>
+                    <ul style="list-style:none;padding:0;margin:0;max-height:60px;overflow:auto;">
+                        <li style="margin-bottom:6px;">2024-06-01 高斯噪声</li>
+                        <li style="margin-bottom:6px;">2024-05-28 遮挡</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div id="page-history" class="page-section" style="display:none">
+            <div class="page-title">历史记录</div>
+            <div class="page-desc">查看您过往的测试任务、结果和操作日志，便于追溯和复现。</div>
+            <div style="margin:24px 0 0 0;">
+                <div style="display:flex;gap:18px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
+                    <input type="text" placeholder="搜索操作对象/类型..." style="padding:4px 10px;border-radius:4px;border:1px solid #d9d9d9;">
+                    <label>操作类型：<select><option>全部</option><option>测试</option><option>异变</option></select></label>
+                    <label>时间范围：<select><option>近一周</option><option>近一月</option><option>全部</option></select></label>
+                </div>
+                <table style="width:100%;border-collapse:collapse;background:#fff;">
+                    <thead>
+                        <tr style="background:#f5f7fa;color:#888;font-size:15px;">
+                            <th style="padding:8px 0;border-bottom:1px solid #e6e6e6;">操作类型</th>
+                            <th style="padding:8px 0;border-bottom:1px solid #e6e6e6;">对象</th>
+                            <th style="padding:8px 0;border-bottom:1px solid #e6e6e6;">时间</th>
+                            <th style="padding:8px 0;border-bottom:1px solid #e6e6e6;">状态</th>
+                            <th style="padding:8px 0;border-bottom:1px solid #e6e6e6;">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="text-align:center;">
+                            <td>测试</td><td>ResNet-50</td><td>2024-06-01</td><td><span style="color:#52c41a;">已完成</span></td><td><a href="#" style="color:#1890ff;">详情</a> | <a href="#" style="color:#faad14;">下载报告</a></td>
+                        </tr>
+                        <tr style="text-align:center;background:#fafbfc;">
+                            <td>异变</td><td>COCO</td><td>2024-05-28</td><td><span style="color:#faad14;">进行中</span></td><td><a href="#" style="color:#1890ff;">详情</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+        // 单页切换逻辑
+        const menuLinks = document.querySelectorAll('.navbar-menu a');
+        const sections = {
+            datasets: document.getElementById('page-datasets'),
+            test: document.getElementById('page-test'),
+            rank: document.getElementById('page-rank'),
+            mutation: document.getElementById('page-mutation'),
+            history: document.getElementById('page-history')
+        };
+        menuLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const page = this.getAttribute('data-page');
+                for (const key in sections) {
+                    sections[key].style.display = (key === page) ? '' : 'none';
+                }
+                // 高亮当前菜单
+                menuLinks.forEach(l => l.style.fontWeight = (l === this) ? 'bold' : 'normal');
+            });
+        });
+        // 能力与数据集映射
+        const abilityDatasetMap = {
+            '推理能力': [
+                {title:'AQUA-RAT', tags:['推理能力'], desc:'AQUA-RAT：数学推理与常识推理数据集'},
+                {title:'ARC', tags:['推理能力'], desc:'ARC：抽象推理挑战数据集'}
+            ],
+            '代码能力': [
+                {title:'HumanEval', tags:['代码能力'], desc:'HumanEval：代码生成与理解评测'},
+                {title:'CodeXGLUE', tags:['代码能力'], desc:'CodeXGLUE：多语言代码任务数据集'}
+            ],
+            '理解能力': [
+                {title:'SQuAD', tags:['理解能力'], desc:'SQuAD：阅读理解与问答数据集'},
+                {title:'CLUEbenchmark', tags:['理解能力'], desc:'CLUEbenchmark：中文理解评测'}
+            ],
+            '对话能力': [
+                {title:'MT Bench', tags:['对话能力'], desc:'MT Bench：多轮对话能力评测'}
+            ],
+            '翻译能力': [
+                {title:'STSB', tags:['翻译能力'], desc:'STSB：语义文本相似度与翻译'}
+            ],
+            '道德性': [
+                {title:'CValues', tags:['道德性'], desc:'CValues：道德性评测'},
+                {title:'Flames', tags:['道德性'], desc:'Flames：道德与价值观评测'}
+            ],
+            '公平性': [
+                {title:'CValues', tags:['公平性'], desc:'CValues：公平性评测'},
+                {title:'Flames', tags:['公平性'], desc:'Flames：公平与偏见评测'}
+            ],
+            '毒性': [
+                {title:'CValues', tags:['毒性'], desc:'CValues：毒性内容检测'},
+                {title:'Flames', tags:['毒性'], desc:'Flames：有害内容检测'}
+            ],
+            '幻觉': [
+                {title:'MMLU', tags:['幻觉'], desc:'MMLU：多学科知识与幻觉检测'},
+                {title:'TruthfulQA', tags:['幻觉'], desc:'TruthfulQA：事实性与幻觉评测'}
+            ]
+        };
+        // 备选全部数据集
+        const allDatasets = [
+            {title:'AQUA-RAT', tags:['推理能力'], desc:'AQUA-RAT：数学推理与常识推理数据集'},
+            {title:'ARC', tags:['推理能力'], desc:'ARC：抽象推理挑战数据集'},
+            {title:'HumanEval', tags:['代码能力'], desc:'HumanEval：代码生成与理解评测'},
+            {title:'CodeXGLUE', tags:['代码能力'], desc:'CodeXGLUE：多语言代码任务数据集'},
+            {title:'SQuAD', tags:['理解能力'], desc:'SQuAD：阅读理解与问答数据集'},
+            {title:'CLUEbenchmark', tags:['理解能力'], desc:'CLUEbenchmark：中文理解评测'},
+            {title:'MT Bench', tags:['对话能力'], desc:'MT Bench：多轮对话能力评测'},
+            {title:'STSB', tags:['翻译能力'], desc:'STSB：语义文本相似度与翻译'},
+            {title:'CValues', tags:['道德性','公平性','毒性'], desc:'CValues：道德性、公平性、毒性评测'},
+            {title:'Flames', tags:['道德性','公平性','毒性'], desc:'Flames：道德、价值观、公平与有害内容检测'},
+            {title:'MMLU', tags:['幻觉'], desc:'MMLU：多学科知识与幻觉检测'},
+            {title:'TruthfulQA', tags:['幻觉'], desc:'TruthfulQA：事实性与幻觉评测'}
+        ];
+        // 渲染数据集列表
+        function renderDatasets(datasets) {
+            const list = document.querySelector('.datasets-list');
+            list.innerHTML = '';
+            datasets.forEach(ds => {
+                const card = document.createElement('div');
+                card.className = 'dataset-card';
+                card.innerHTML = `
+                    <div class="dataset-title">${ds.title}</div>
+                    <div class="dataset-tags">
+                        ${ds.tags.map(t => `<span class="tag blue">${t}</span>`).join(' ')}
+                    </div>
+                    <div class="dataset-desc">${ds.desc}</div>
+                `;
+                list.appendChild(card);
+            });
+            // 更新数量
+            document.querySelector('.datasets-header-count').innerText = `共 ${datasets.length} 个`;
+        }
+        // 处理点击事件
+        document.querySelectorAll('.eval-leaf').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.eval-leaf').forEach(i => i.classList.remove('selected'));
+                this.classList.add('selected');
+                const ability = this.getAttribute('data-ability');
+                if (abilityDatasetMap[ability]) {
+                    renderDatasets(abilityDatasetMap[ability]);
+                }
+            });
+        });
+        // 默认显示全部
+        renderDatasets(allDatasets);
+        // 模型API地址保存逻辑
+        (function(){
+            const input = document.getElementById('model-api-url');
+            const btn = document.getElementById('save-api-url');
+            const result = document.getElementById('api-url-result');
+            if (!input || !btn) return;
+            // 可选：自动回显上次填写
+            if (localStorage.getItem('modelApiUrl')) {
+                input.value = localStorage.getItem('modelApiUrl');
+                result.innerText = '当前API地址：' + input.value;
+            }
+            btn.addEventListener('click', function(){
+                const url = input.value.trim();
+                if (!url) {
+                    result.style.color = '#f5222d';
+                    result.innerText = '请输入API地址';
+                    return;
+                }
+                localStorage.setItem('modelApiUrl', url);
+                result.style.color = '#52c41a';
+                result.innerText = '已保存，当前API地址：' + url;
+            });
+        })();
+        // 新增：测试类型选择逻辑
+        (function(){
+            const btns = document.querySelectorAll('.test-type-btn');
+            const mainWrap = document.getElementById('test-main-wrap');
+            btns.forEach(btn=>{
+                btn.onclick = function(){
+                    btns.forEach(b=>b.classList.remove('selected'));
+                    this.classList.add('selected');
+                    if(this.dataset.type==='general'){
+                        window.location.href = 'general_test.html';
+                    }else{
+                        mainWrap.style.display='none';
+                    }
+                };
+            });
+        })();
+        // 步骤切换逻辑（进度条同步三段式）
+        (function(){
+            let step = 1;
+            const total = 3;
+            const panels = [
+                document.getElementById('test-step-1'),
+                document.getElementById('test-step-2'),
+                document.getElementById('test-step-3')
+            ];
+            const label = document.getElementById('test-step-label');
+            const stepLabels = [
+                document.getElementById('step-label-1'),
+                document.getElementById('step-label-2'),
+                document.getElementById('step-label-3')
+            ];
+            // 新增：三段式进度条
+            const segs = [
+                document.getElementById('step-seg-1'),
+                document.getElementById('step-seg-2'),
+                document.getElementById('step-seg-3')
+            ];
+            function updateStep() {
+                panels.forEach((p,i)=>p.style.display = (i===step-1)?'':'none');
+                label.innerText = `步骤 ${step} / ${total}`;
+                stepLabels.forEach((l,i)=>{
+                    l.style.color = (i===step-1)?'#1890ff':'#888';
+                    l.style.fontWeight = (i===step-1)?'bold':'normal';
+                });
+                segs.forEach((seg,i)=>{
+                    seg.classList.remove('active','done');
+                    if(i<step-1) seg.classList.add('done');
+                    else if(i===step-1) seg.classList.add('active');
+                });
+            }
+            document.getElementById('test-next-1').onclick = function(){step=2;updateStep();};
+            document.getElementById('test-next-2').onclick = function(){step=3;updateStep();};
+            document.getElementById('test-prev-2').onclick = function(){step=1;updateStep();};
+            document.getElementById('test-prev-3').onclick = function(){step=2;updateStep();};
+            document.getElementById('test-finish').onclick = function(){alert('测试流程已完成！');};
+            updateStep();
+        })();
+    </script>
+</body>
+</html> 

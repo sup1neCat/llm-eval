@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>通用大模型测评 - 测试流程</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: "微软雅黑", Arial, sans-serif;
+            background: #f7fafd;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 30px auto 0 auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);     
+            padding: 32px 40px 40px 40px;
+        }
+        .page-title {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .page-desc {
+            color: #666;
+            font-size: 15px;
+            margin-bottom: 30px;
+        }
+        .test-center-wrap {
+            display: flex;
+            justify-content: center;
+            margin-top: 24px;
+        }
+        .test-main-card {
+            width: 100%;
+            max-width: 680px;
+            background: #fff;
+            border-radius: 8px;
+            padding: 24px 28px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+            box-sizing: border-box;
+        }
+        /* 三段式进度条纯色+箭头 */
+        .step-progress-bar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 56px;
+            min-width: 56px;
+            margin: 0 48px 0 0;
+            height: 180px;
+            position: relative;
+            justify-content: center;
+        }
+        .step-segment {
+            width: 48px;
+            height: 48px;
+            margin: 0 0 32px 0;
+            border-radius: 50%;
+            background: #e0e6ed;
+            position: relative;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: bold;
+            color: #888;
+            box-shadow: 0 2px 8px rgba(24,144,255,0.06);
+        }
+        .step-segment:last-child {
+            margin-bottom: 0;
+        }
+        .step-segment.active {
+            background: #14407a;
+            color: #fff;
+            font-size: 26px;
+            box-shadow: 0 4px 16px rgba(20,64,122,0.12);
+        }
+        .step-segment.done {
+            background: #1890ff;
+            color: #fff;
+        }
+        .step-segment.active span {
+            color: #fff;
+        }
+        .step-segment span {
+            color: inherit;
+        }
+        /* 箭头样式 */
+        .step-arrow {
+            position: absolute;
+            right: -18px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 24px;
+            z-index: 3;
+        }
+        .step-arrow svg {
+            width: 24px;
+            height: 24px;
+            display: block;
+        }
+        /* 横向柱状图容器 */
+        .bar-chart-wrap {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        /* 柱状图简约配色 */
+        .bar-chart-wrap canvas {
+            background: transparent;
+        }
+        /* 修复内容与进度条重叠问题 */
+        .test-step-panel-flex {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            gap: 0;
+        }
+        .test-step-panel-content {
+            flex: 1;
+            min-width: 0;
+        }
+        @media (max-width: 900px) {
+            .test-step-panel-flex { flex-direction: column; }
+            .step-progress-bar { flex-direction: row; width: 100%; min-width: 0; height: auto; margin: 0 0 32px 0; }
+            .step-segment { margin: 0 32px 0 0; }
+            .step-segment:last-child { margin-right: 0; }
+        }
+        /* 通用大模型测评按钮纯色风格 */
+        .test-type-btn {
+            background: #fff;
+            color: #18344b;
+            border: 2px solid #1890ff;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 500;
+            padding: 18px 44px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(24,144,255,0.06);
+        }
+        .test-type-btn.selected, .test-type-btn:hover {
+            background: #e6f7ff;
+            color: #1890ff;
+            border-color: #1890ff;
+        }
+        /* 横向进度条+数字节点样式 */
+        .step-horizontal-bar-wrap {
+            margin-bottom: 32px;
+        }
+        .step-horizontal-bar-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .step-horizontal-bar-title {
+            font-size: 22px;
+            font-weight: bold;
+        }
+        .step-horizontal-bar-status {
+            color: #888;
+            font-size: 16px;
+        }
+        .step-horizontal-bar {
+            width: 100%;
+            height: 10px;
+            background: #e5eaf3;
+            border-radius: 6px;
+            position: relative;
+            margin-bottom: 18px;
+        }
+        .step-horizontal-bar-progress {
+            height: 100%;
+            background: #1890ff;
+            border-radius: 6px;
+            transition: width 0.5s;
+        }
+        .step-horizontal-labels {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-top: 0;
+        }
+        .step-horizontal-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            min-width: 0;
+        }
+        .step-horizontal-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #e5eaf3;
+            color: #888;
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 6px;
+            transition: background 0.3s, color 0.3s;
+        }
+        .step-horizontal-label.active .step-horizontal-num {
+            background: #1890ff;
+            color: #fff;
+        }
+        .step-horizontal-label.active .step-horizontal-text {
+            color: #1890ff;
+            font-weight: bold;
+        }
+        .step-horizontal-text {
+            color: #888;
+            font-size: 16px;
+            font-weight: normal;
+            transition: color 0.3s, font-weight 0.3s;
+        }
+        /* 顶部标签区 */
+        #selected-datasets-bar .tag {
+            background: linear-gradient(90deg,#e6f0ff 0%,#f7fafd 100%);
+            color: #14407a;
+            border-radius: 18px;
+            font-size: 16px;
+            padding: 6px 18px;
+            margin: 0 12px 12px 0;
+            box-shadow: 0 2px 8px rgba(24,144,255,0.06);
+            display: inline-flex;
+            align-items: center;
+            transition: box-shadow 0.2s;
+        }
+        #selected-datasets-bar .tag:hover {
+            box-shadow: 0 4px 16px rgba(24,144,255,0.12);
+        }
+        #selected-datasets-bar .tag span:last-child {
+            margin-left: 8px;
+            color: #faad14;
+            font-size: 18px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        #selected-datasets-bar .tag span:last-child:hover {
+            color: #f5222d;
+        }
+        /* 左侧分组卡片 */
+        #dataset-group-list, #dataset-subgroup-list {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(24,64,122,0.06);
+            padding: 18px 0 10px 0;
+            margin-bottom: 18px;
+        }
+        #dataset-group-list .tag, #dataset-subgroup-list .tag {
+            border-radius: 12px 0 0 12px;
+            margin: 0 0 8px 0;
+            padding: 10px 28px 10px 22px;
+            font-size: 16px;
+            font-weight: 600;
+            background: none;
+            color: #18344b;
+            transition: background 0.2s, color 0.2s;
+        }
+        #dataset-group-list .tag.selected {
+            background: linear-gradient(90deg, #7b8cff 0%, #4fc3ff 100%);
+            color: #fff;
+        }
+        #dataset-group-list .tag:hover:not(.selected) {
+            background: #f2f7ff;
+            color: #4fc3ff;
+        }
+        #dataset-subgroup-list .tag {
+            border-radius: 10px 0 0 10px;
+            margin: 0 0 8px 0;
+            padding: 8px 22px 8px 20px;
+            font-size: 15px;
+            font-weight: 500;
+            background: none;
+            color: #18344b;
+            transition: background 0.2s, color 0.2s;
+        }
+        #dataset-subgroup-list .tag.selected {
+            background: linear-gradient(90deg, #e3f0ff 0%, #cbeaff 100%);
+            color: #4fc3ff;
+            font-weight: 600;
+        }
+        #dataset-subgroup-list .tag:hover:not(.selected) {
+            background: linear-gradient(90deg, #d6eaff 0%, #eaf6ff 100%);
+            color: #4fc3ff;
+        }
+        /* 右侧数据集卡片 */
+        .datasets-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 28px;
+        }
+        .dataset-card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(24,64,122,0.06);
+            border: 1.5px solid #e6e6e6;
+            padding: 28px 28px 22px 28px;
+            transition: box-shadow 0.2s, transform 0.2s, background 0.2s, border 0.2s, color 0.2s;
+            cursor: pointer;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+        .dataset-card:hover {
+            box-shadow: 0 8px 24px rgba(24,144,255,0.10);
+            transform: translateY(-2px) scale(1.02);
+        }
+        .dataset-card.selected {
+            background: linear-gradient(180deg,rgba(111,208,255,0.18) 0%,#fff 70%,#fff 100%);
+            border: 2px solid #a18fff;
+            color: #14407a;
+        }
+        .dataset-card.selected .dataset-title,
+        .dataset-card.selected .dataset-desc {
+            color: #14407a;
+        }
+        .dataset-card .dataset-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+        .dataset-card .dataset-tags {
+            margin-bottom: 12px;
+        }
+        .dataset-card .dataset-tags .tag {
+            background: #e6f7ff;
+            color: #1890ff;
+            border-radius: 10px;
+            font-size: 14px;
+            padding: 2px 12px;
+            margin-right: 8px;
+        }
+        .dataset-card .dataset-desc {
+            color: #555;
+            font-size: 15px;
+            min-height: 36px;
+            line-height: 1.6;
+        }
+        /* 按钮 */
+        #test-next-2, #test-prev-2 {
+            border-radius: 10px;
+            font-size: 18px;
+            padding: 12px 56px;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(24,144,255,0.06);
+            transition: background 0.2s, color 0.2s;
+        }
+        #test-next-2 {
+            background: linear-gradient(90deg,#1890ff 0%,#14407a 100%);
+            color: #fff;
+            border: none;
+        }
+        #test-next-2:hover {
+            background: linear-gradient(90deg,#14407a 0%,#1890ff 100%);
+        }
+        #test-prev-2 {
+            background: #f5f7fa;
+            color: #18344b;
+            border: none;
+        }
+        #test-prev-2:hover {
+            background: #e6f7ff;
+            color: #1890ff;
+        }
+        /* 数据集卡片顶部紫蓝渐变条 */
+        .dataset-card .card-top-bar {
+            display: none;
+            height: 6px;
+            border-radius: 16px 16px 0 0;
+            background: linear-gradient(90deg,#a18fff 0%,#6fd0ff 100%);
+            position: absolute;
+            left: 0; right: 0; top: 0;
+            transition: opacity 0.2s;
+            opacity: 0.95;
+            z-index: 2;
+        }
+        .dataset-card:hover .card-top-bar {
+            display: block;
+        }
+        /* 分段式进度条美化 */
+        .segment-progress-bar-wrap {
+            margin-bottom: 24px;
+            padding: 0 8px;
+        }
+        .segment-progress-bar {
+            display: flex;
+            align-items: center;
+            height: 18px;
+            background: #f2f7ff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(24,144,255,0.06);
+        }
+        .segment-progress-segment {
+            flex: 1;
+            height: 100%;
+            position: relative;
+            transition: background 0.3s;
+            background: #e3eaf3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .segment-progress-segment.active {
+            background: linear-gradient(90deg,#7b8cff 0%,#4fc3ff 100%);
+        }
+        .segment-progress-segment.done {
+            background: #b3e5fc;
+        }
+        .segment-progress-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+        }
+        .segment-progress-label {
+            flex: 1;
+            text-align: center;
+            font-size: 15px;
+            color: #4fc3ff;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 测试流程进度条和步骤指示，移到最上方 -->
+        <div class="step-horizontal-bar-wrap">
+            <div class="step-horizontal-bar-head">
+                <div class="step-horizontal-bar-title">测试流程</div>
+                <div class="step-horizontal-bar-status" id="test-step-label">步骤 1 / 4</div>
+            </div>
+            <div class="step-horizontal-bar">
+                <div class="step-horizontal-bar-progress" id="step-bar-progress" style="width:33%;"></div>
+            </div>
+            <div class="step-horizontal-labels">
+                <div class="step-horizontal-label active" id="step-label-1">
+                    <div class="step-horizontal-num">1</div>
+                    <div class="step-horizontal-text">上传模型</div>
+                </div>
+                <div class="step-horizontal-label" id="step-label-2">
+                    <div class="step-horizontal-num">2</div>
+                    <div class="step-horizontal-text">选择测评数据集</div>
+                </div>
+                <div class="step-horizontal-label" id="step-label-3">
+                    <div class="step-horizontal-num">3</div>
+                    <div class="step-horizontal-text">启动测试</div>
+                </div>
+                <div class="step-horizontal-label" id="step-label-4">
+                    <div class="step-horizontal-num">4</div>
+                    <div class="step-horizontal-text">结果查询</div>
+                </div>
+            </div>
+        </div>
+        <div class="test-center-wrap" style="display:block;max-width:1200px;margin:0 auto;">
+            <!-- 步骤一：上传模型及参数配置 -->
+            <div id="test-step-1" class="test-step-panel" style="max-width:900px;margin:0 auto 48px auto;">
+                <div style="font-size:24px;font-weight:bold;margin-bottom:32px;text-align:left;">上传模型</div>
+                <div style="padding:0 0 32px 0;margin-bottom:40px;display:flex;flex-direction:column;gap:32px;align-items:stretch;">
+                    <div>
+                        <div style="font-weight:500;margin-bottom:10px;">模型名称</div>
+                        <input id="input-model-name" type="text" placeholder="请输入模型名称" style="width:100%;padding:12px 14px;border-radius:6px;border:1px solid #b5d3f3;font-size:16px;background:#fff;" />
+                    </div>
+                    <div>
+                        <div style="font-weight:500;margin-bottom:10px;">API中转地址</div>
+                        <input id="input-api-proxy" type="text" placeholder="请输入API中转地址" style="width:100%;max-width:600px;padding:12px 14px;border-radius:6px;border:1px solid #b5d3f3;font-size:16px;background:#fff;" />
+                    </div>
+                    <div>
+                        <div style="font-weight:500;margin-bottom:10px;">API</div>
+                        <input id="input-api-url" type="text" placeholder="请输入API" style="width:100%;max-width:600px;padding:12px 14px;border-radius:6px;border:1px solid #b5d3f3;font-size:16px;background:#fff;" />
+                        <div style="margin-top:10px;">
+                            <button id="btn-check-api" style="background:#4fc3ff;color:#fff;border:none;border-radius:6px;padding:10px 32px;font-size:15px;cursor:pointer;">检查</button>
+                            <span id="api-check-result" style="margin-left:18px;font-size:15px;vertical-align:middle;"></span>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:24px;align-items:flex-end;flex-wrap:wrap;">
+                        <div style="flex:1;min-width:220px;">
+                            <div style="font-weight:500;margin-bottom:10px;">参数配置</div>
+                            <div style="background:#f8fafc;border-radius:12px;box-shadow:0 2px 8px rgba(24,144,255,0.06);padding:28px 32px 18px 32px;margin:0;max-width:400px;">
+                                <div style="font-weight:600;font-size:17px;margin-bottom:18px;">模型参数</div>
+                                <div style="display:flex;flex-direction:row;gap:24px;align-items:flex-end;">
+                                    <div style="flex:1;">
+                                        <div style="font-weight:500;margin-bottom:10px;">max token</div>
+                                        <input id="input-max-tokens" type="number" min="1" max="4096" value="512" style="width:100%;max-width:150px;padding:12px 14px;border-radius:6px;border:1px solid #b5d3f3;font-size:16px;background:#fff;" />
+                                    </div>
+                                    <div style="flex:1;">
+                                        <div style="font-weight:500;margin-bottom:10px;">temperature</div>
+                                        <input id="input-temperature" type="number" min="0" max="2" step="0.01" value="1.0" style="width:100%;max-width:150px;padding:12px 14px;border-radius:6px;border:1px solid #b5d3f3;font-size:16px;background:#fff;" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="font-weight:500;margin-bottom:10px;">上传模型文件</div>
+                        <div style="border:2px dashed #b5d3f3;border-radius:8px;padding:32px;text-align:center;color:#888;background:#fff;">
+                            <span>拖拽文件到这里，或点击选择</span>
+                            <br><button style="margin-top:14px;background:#1890ff;color:#fff;border:none;border-radius:4px;padding:10px 24px;font-size:16px;cursor:pointer;">浏览</button>
+                        </div>
+                    </div>
+                </div>
+                <div style="text-align:center;margin-top:18px;">
+                    <button id="test-next-1" style="background:#1890ff;color:#fff;border:none;border-radius:6px;padding:12px 56px;font-size:18px;cursor:pointer;">下一步</button>
+                </div>
+            </div>
+            <!-- 新增：步骤二 测评数据集选择（多级分类+渐变高亮） -->
+            <div id="test-step-2" class="test-step-panel" style="max-width:1100px;margin:0 auto 48px auto;display:none;">
+                <div style="font-size:24px;font-weight:bold;margin-bottom:18px;text-align:left;">选择测评数据集</div>
+                <div id="selected-datasets-bar" style="margin-bottom:18px;min-height:32px;"></div>
+                <div style="display:flex;gap:40px;align-items:flex-start;">
+                    <!-- 左侧多级分类 -->
+                    <div style="min-width:220px;">
+                        <div style="font-weight:bold;margin-bottom:10px;color:#18344b;">分类筛选</div>
+                        <div id="dataset-group-list"></div>
+                        <div id="dataset-subgroup-list" style="margin-top:18px;"></div>
+                    </div>
+                    <!-- 右侧卡片区 -->
+                    <div style="flex:1;">
+                        <div class="datasets-list" id="dataset-list" style="display:grid;grid-template-columns:repeat(2,1fr);gap:24px;"></div>
+                    </div>
+                </div>
+                <div style="text-align:center;margin-top:28px;">
+                    <button id="test-prev-2" style="background:#e0e6ed;color:#18344b;border:none;border-radius:6px;padding:12px 44px;font-size:17px;cursor:pointer;margin-right:24px;">上一步</button>
+                    <button id="test-next-2" style="background:#1890ff;color:#fff;border:none;border-radius:6px;padding:12px 56px;font-size:18px;cursor:pointer;">下一步</button>
+                </div>
+            </div>
+            <!-- 步骤三：启动测试 -->
+            <div id="test-step-3" class="test-step-panel" style="max-width:900px;margin:0 auto 48px auto;display:none;">
+                <div style="font-size:24px;font-weight:bold;margin-bottom:32px;text-align:left;">启动测试</div>
+                <div id="progress-bar-section" style="margin-bottom:32px;"></div>
+                <div style="display:flex;flex-direction:column;gap:32px;margin-bottom:40px;">
+                    <div>
+                        <div style="font-weight:500;margin-bottom:12px;">实时运行信息</div>
+                        <div style="background:#23272e;color:#e6e6e6;font-family:monospace,Consolas,Menlo,monaco,monospace;font-size:15px;border-radius:8px;padding:24px 20px;min-height:120px;box-shadow:0 2px 8px rgba(24,144,255,0.06);">
+                            问题 12: 这是一个测试问题。\n结果：正确\n...\n[运行中...]
+                        </div>
+                    </div>
+                    <div>
+                        <div style="font-weight:500;margin-bottom:12px;">测评信息</div>
+                        <div style="background:#f8fafc;border-radius:8px;padding:24px 20px;box-shadow:0 2px 8px rgba(24,144,255,0.03);">
+                            <div style="color:#666;font-size:15px;margin-bottom:10px;">模型名称：<span id="info-model-name">模型 B</span></div>
+                            <div style="color:#666;font-size:15px;margin-bottom:10px;">测试类型：全面测试</div>
+                            <div style="color:#666;font-size:15px;margin-bottom:10px;">测评数据集：<span id="info-dataset-tags"></span></div>
+                            <div style="color:#666;font-size:15px;">开始时间：2024-01-01 10:00</div>
+                        </div>
+                    </div>
+                </div>
+                <div style="text-align:center;margin-top:18px;">
+                    <button id="test-prev-3" style="background:#e0e6ed;color:#18344b;border:none;border-radius:6px;padding:12px 44px;font-size:17px;cursor:pointer;margin-right:24px;">上一步</button>
+                    <button id="test-next-3" style="background:#1890ff;color:#fff;border:none;border-radius:6px;padding:12px 56px;font-size:18px;cursor:pointer;">下一步</button>
+                </div>
+            </div>
+            <!-- 步骤四：结果查询 -->
+            <div id="test-step-4" class="test-step-panel" style="max-width:1100px;margin:0 auto 48px auto;display:none;">
+                <div style="font-size:24px;font-weight:bold;margin-bottom:32px;text-align:left;">结果查询</div>
+                <div style="padding:0 0 32px 0;margin-bottom:40px;display:flex;flex-direction:column;gap:32px;align-items:stretch;">
+                    <div>
+                        <div style="font-weight:500;margin-bottom:12px;">基本信息</div>
+                        <div style="display:flex;flex-direction:column;gap:10px;">
+                            <div style="color:#666;font-size:16px;">测试名称：模型性能评测</div>
+                            <div style="color:#666;font-size:16px;">测试时间：2024-01-15 14:30</div>
+                            <div style="color:#666;font-size:16px;">模型名称：<span id="result-model-name">Model-X</span></div>
+                            <div style="color:#666;font-size:16px;">测评数据集：<span id="result-dataset-tags"></span></div>
+                            <div style="color:#666;font-size:16px;">数据集名称：Dataset-A</div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="font-weight:500;margin-bottom:12px;">关键指标</div>
+                        <div style="display:flex;gap:24px;flex-wrap:wrap;">
+                            <div style="background:#fff;border:1px solid #e5eaf3;border-radius:8px;padding:18px 28px;min-width:120px;box-shadow:0 1px 4px rgba(24,144,255,0.03);display:flex;flex-direction:column;align-items:center;">
+                                <div style="color:#222;font-size:22px;font-weight:bold;letter-spacing:1px;">95.2%</div>
+                                <div style="color:#888;font-size:15px;margin-top:4px;">准确率</div>
+                            </div>
+                            <div style="background:#fff;border:1px solid #e5eaf3;border-radius:8px;padding:18px 28px;min-width:120px;box-shadow:0 1px 4px rgba(24,144,255,0.03);display:flex;flex-direction:column;align-items:center;">
+                                <div style="color:#222;font-size:22px;font-weight:bold;letter-spacing:1px;">94.8%</div>
+                                <div style="color:#888;font-size:15px;margin-top:4px;">精度</div>
+                            </div>
+                            <div style="background:#fff;border:1px solid #e5eaf3;border-radius:8px;padding:18px 28px;min-width:120px;box-shadow:0 1px 4px rgba(24,144,255,0.03);display:flex;flex-direction:column;align-items:center;">
+                                <div style="color:#222;font-size:22px;font-weight:bold;letter-spacing:1px;">96.1%</div>
+                                <div style="color:#888;font-size:15px;margin-top:4px;">召回率</div>
+                            </div>
+                        </div>
+                        <div style="text-align:right;margin-top:10px;">
+                            <button style="background:#1890ff;color:#fff;border:none;border-radius:4px;padding:8px 22px;font-size:16px;cursor:pointer;">下载完整报告</button>
+                        </div>
+                    </div>
+                </div>
+                <div style="text-align:center;margin-top:18px;">
+                    <button id="test-prev-4" style="background:#e0e6ed;color:#18344b;border:none;border-radius:6px;padding:12px 44px;font-size:17px;cursor:pointer;margin-right:24px;">上一步</button>
+                    <button id="test-finish" style="background:#1890ff;color:#fff;border:none;border-radius:6px;padding:12px 56px;font-size:18px;cursor:pointer;">完成</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // 步骤进度条和切换逻辑（4步）
+        (function(){
+            let step = 1;
+            const total = 4;
+            const panels = [
+                document.getElementById('test-step-1'),
+                document.getElementById('test-step-2'),
+                document.getElementById('test-step-3'),
+                document.getElementById('test-step-4')
+            ];
+            function updateStepBar() {
+                let percent = step * 100 / total;
+                document.querySelectorAll('.step-horizontal-bar-progress').forEach(bar=>{
+                    bar.style.width = percent + '%';
+                });
+                for(let i=1;i<=4;i++){
+                    let label = document.querySelectorAll('#step-label-' + i);
+                    label.forEach(l=>l.classList.remove('active'));
+                }
+                document.querySelectorAll('#step-label-' + step).forEach(l=>l.classList.add('active'));
+                document.querySelectorAll('#test-step-label').forEach(l=>l.innerText = `步骤 ${step} / ${total}`);
+            }
+            document.getElementById('test-next-1').onclick = function(){step=2;updateStepBar();panels.forEach((p,i)=>p.style.display = (i===step-1)?'':'none');};
+            document.getElementById('test-next-2').onclick = function(){
+                if(window.selectedDatasets.length===0){alert('请至少选择一个数据集！');return;}
+                step=3;updateStepBar();panels.forEach((p,i)=>p.style.display = (i===step-1)?'':'none');
+                document.getElementById('info-dataset-tags').innerHTML = window.selectedDatasets.map(ds=>`<span class='tag'>${ds}</span>`).join(' ');
+            };
+            document.getElementById('test-next-3').onclick = function(){
+                step=4;updateStepBar();panels.forEach((p,i)=>p.style.display = (i===step-1)?'':'none');
+                document.getElementById('result-dataset-tags').innerHTML = window.selectedDatasets.map(ds=>`<span class='tag'>${ds}</span>`).join(' ');
+            };
+            document.getElementById('test-prev-2').onclick = function(){step=1;updateStepBar();panels.forEach((p,i)=>p.style.display = (i===step-1)?'':'none');};
+            document.getElementById('test-prev-3').onclick = function(){step=2;updateStepBar();panels.forEach((p,i)=>p.style.display = (i===step-1)?'':'none');};
+            document.getElementById('test-prev-4').onclick = function(){step=3;updateStepBar();panels.forEach((p,i)=>p.style.display = (i===step-1)?'':'none');};
+            document.getElementById('test-finish').onclick = function(){alert('测试流程已完成！');};
+            updateStepBar();
+        })();
+        // 多级分类与数据集映射（参考e.html）
+        const datasetGroupStructure = [
+            {
+                group: '能力评估',
+                key: 'ability',
+                sub: [
+                    {name:'推理能力', key:'推理能力'},
+                    {name:'代码能力', key:'代码能力'},
+                    {name:'理解能力', key:'理解能力'},
+                    {name:'对话能力', key:'对话能力'},
+                    {name:'翻译能力', key:'翻译能力'}
+                ]
+            },
+            {
+                group: '对齐评估',
+                key: 'alignment',
+                sub: [
+                    {name:'道德性', key:'道德性'},
+                    {name:'公平性', key:'公平性'},
+                    {name:'毒性', key:'毒性'},
+                    {name:'幻觉', key:'幻觉'}
+                ]
+            },
+            {
+                group: '安全评估',
+                key: 'security',
+                sub: [
+                    {name:'越狱攻击', key:'越狱攻击'},
+                    {name:'后门攻击', key:'后门攻击'}
+                ]
+            }
+        ];
+        // 细分能力与数据集映射
+        const abilityDatasetMap = {
+            '推理能力': [
+                {title:'AQUA-RAT', tags:['推理能力'], desc:'AQUA-RAT：数学推理与常识推理数据集'},
+                {title:'ARC', tags:['推理能力'], desc:'ARC：抽象推理挑战数据集'}
+            ],
+            '代码能力': [
+                {title:'HumanEval', tags:['代码能力'], desc:'HumanEval：代码生成与理解评测'},
+                {title:'CodeXGLUE', tags:['代码能力'], desc:'CodeXGLUE：多语言代码任务数据集'}
+            ],
+            '理解能力': [
+                {title:'SQuAD', tags:['理解能力'], desc:'SQuAD：阅读理解与问答数据集'},
+                {title:'CLUEbenchmark', tags:['理解能力'], desc:'CLUEbenchmark：中文理解评测'}
+            ],
+            '对话能力': [
+                {title:'MT Bench', tags:['对话能力'], desc:'MT Bench：多轮对话能力评测'}
+            ],
+            '翻译能力': [
+                {title:'STSB', tags:['翻译能力'], desc:'STSB：语义文本相似度与翻译'}
+            ],
+            '道德性': [
+                {title:'CValues', tags:['道德性'], desc:'CValues：道德性评测'},
+                {title:'Flames', tags:['道德性'], desc:'Flames：道德与价值观评测'}
+            ],
+            '公平性': [
+                {title:'CValues', tags:['公平性'], desc:'CValues：公平性评测'},
+                {title:'Flames', tags:['公平性'], desc:'Flames：公平与偏见评测'}
+            ],
+            '毒性': [
+                {title:'CValues', tags:['毒性'], desc:'CValues：毒性内容检测'},
+                {title:'Flames', tags:['毒性'], desc:'Flames：有害内容检测'}
+            ],
+            '幻觉': [
+                {title:'MMLU', tags:['幻觉'], desc:'MMLU：多学科知识与幻觉检测'},
+                {title:'TruthfulQA', tags:['幻觉'], desc:'TruthfulQA：事实性与幻觉评测'}
+            ],
+            '越狱攻击': [
+                {title:'JailbreakEval', tags:['越狱攻击'], desc:'JailbreakEval：越狱攻击检测数据集'}
+            ],
+            '后门攻击': [
+                {title:'BackdoorEval', tags:['后门攻击'], desc:'BackdoorEval：后门攻击检测数据集'}
+            ]
+        };
+        // 选中数据集全局变量
+        window.selectedDatasets = [];
+        // 当前选中分组和细分能力
+        let currentGroupKey = 'ability';
+        let currentSubKey = '推理能力';
+        // 渲染左侧一级分组
+        function renderDatasetGroupList(){
+            const groupList = document.getElementById('dataset-group-list');
+            groupList.innerHTML = '';
+            datasetGroupStructure.forEach(g=>{
+                const btn = document.createElement('div');
+                btn.innerText = g.group;
+                btn.className = 'tag';
+                btn.style.display = 'block';
+                btn.style.margin = '0 0 8px 0';
+                btn.style.cursor = 'pointer';
+                btn.style.fontWeight = 'bold';
+                btn.style.fontSize = '15px';
+                if(currentGroupKey===g.key){
+                    btn.style.background = 'linear-gradient(90deg,#8e8cf7 0%,#a3bfff 100%)';
+                    btn.style.color = '#fff';
+                }
+                btn.onclick = function(){
+                    currentGroupKey = g.key;
+                    // 默认选中第一个细分能力
+                    currentSubKey = g.sub[0].key;
+                    renderDatasetGroupList();
+                    renderDatasetSubGroupList();
+                    renderDatasetList();
+                };
+                groupList.appendChild(btn);
+            });
+        }
+        // 渲染左侧二级细分能力
+        function renderDatasetSubGroupList(){
+            const subList = document.getElementById('dataset-subgroup-list');
+            subList.innerHTML = '';
+            const group = datasetGroupStructure.find(g=>g.key===currentGroupKey);
+            (group?.sub||[]).forEach(sub=>{
+                const btn = document.createElement('div');
+                btn.innerText = sub.name;
+                btn.className = 'tag';
+                btn.style.display = 'block';
+                btn.style.margin = '0 0 8px 0';
+                btn.style.cursor = 'pointer';
+                btn.style.fontSize = '14px';
+                if(currentSubKey===sub.key){
+                    btn.style.background = 'linear-gradient(90deg,#1890ff 0%,#e6f7ff 100%)';
+                    btn.style.color = '#14407a';
+                    btn.style.fontWeight = 'bold';
+                }
+                btn.onclick = function(){
+                    currentSubKey = sub.key;
+                    renderDatasetSubGroupList();
+                    renderDatasetList();
+                };
+                subList.appendChild(btn);
+            });
+        }
+        // 渲染右侧数据集卡片
+        function renderDatasetList(){
+            const list = document.getElementById('dataset-list');
+            list.innerHTML = '';
+            (abilityDatasetMap[currentSubKey]||[]).forEach(ds=>{
+                const card = document.createElement('div');
+                card.className = window.selectedDatasets.includes(ds.title) ? 'dataset-card selected' : 'dataset-card';
+                card.style.border = window.selectedDatasets.includes(ds.title)?'2px solid #a18fff':'1px solid #e6e6e6';
+                card.style.cursor = 'pointer';
+                card.onclick = function(){
+                    const idx = window.selectedDatasets.indexOf(ds.title);
+                    if(idx===-1){
+                        window.selectedDatasets.push(ds.title);
+                    }else{
+                        window.selectedDatasets.splice(idx,1);
+                    }
+                    renderDatasetList();
+                    renderSelectedDatasetsBar();
+                };
+                card.innerHTML = `
+                    <div class="card-top-bar"></div>
+                    <div class="dataset-title" style="font-size:16px;font-weight:bold;margin-bottom:8px;">${ds.title}</div>
+                    <div class="dataset-tags" style="margin-bottom:10px;">
+                        ${ds.tags.map(t=>`<span class='tag blue' style='margin-right:6px;'>${t}</span>`).join(' ')}
+                    </div>
+                    <div class="dataset-desc" style="font-size:14px;min-height:40px;">${ds.desc}</div>
+                `;
+                list.appendChild(card);
+            });
+        }
+        // 渲染已选数据集标签
+        function renderSelectedDatasetsBar(){
+            const bar = document.getElementById('selected-datasets-bar');
+            bar.innerHTML = '';
+            // 能力名 => [数据集]
+            const abilityMap = {};
+            window.selectedDatasets.forEach(ds=>{
+                for(const [ability, arr] of Object.entries(abilityDatasetMap)){
+                    if(arr.some(item=>item.title===ds)){
+                        if(!abilityMap[ability]) abilityMap[ability] = [];
+                        abilityMap[ability].push(ds);
+                        break;
+                    }
+                }
+            });
+            Object.entries(abilityMap).forEach(([ability, dsArr])=>{
+                const tag = document.createElement('span');
+                tag.className = 'tag';
+                tag.style.marginRight = '8px';
+                tag.innerHTML = `<b>${ability}：</b>` + dsArr.map(d=>`<span style='display:inline-block;background:#e6f7ff;color:#1890ff;border-radius:10px;padding:2px 10px;margin:0 4px;font-size:14px;'>${d}</span>`).join('');
+                // 移除按钮
+                const close = document.createElement('span');
+                close.innerText = ' ×';
+                close.style.cursor = 'pointer';
+                close.style.marginLeft = '4px';
+                close.onclick = function(){
+                    // 移除该能力下所有数据集
+                    window.selectedDatasets = window.selectedDatasets.filter(d=>!dsArr.includes(d));
+                    renderSelectedDatasetsBar();
+                    renderDatasetList();
+                };
+                tag.appendChild(close);
+                bar.appendChild(tag);
+            });
+        }
+        // 分段式进度条渲染
+        function renderSegmentProgressBar(currentIdx=0){
+            const wrap = document.getElementById('progress-bar-section');
+            if(!wrap) return;
+            const datasets = window.selectedDatasets || [];
+            if(!datasets.length){ wrap.innerHTML=''; return; }
+            let html = '<div class="segment-progress-bar-wrap">';
+            html += '<div class="segment-progress-bar">';
+            for(let i=0;i<datasets.length;i++){
+                let cls = '';
+                if(i<currentIdx) cls='done';
+                else if(i===currentIdx) cls='active';
+                html += `<div class=\"segment-progress-segment ${cls}\"></div>`;
+            }
+            html += '</div>';
+            html += '<div class="segment-progress-labels">';
+            for(let i=0;i<datasets.length;i++){
+                html += `<div class=\"segment-progress-label\">${datasets[i]}</div>`;
+            }
+            html += '</div></div>';
+            wrap.innerHTML = html;
+        }
+        // 在进入第三步时渲染进度条，默认高亮第一个
+        const oldTestNext2 = document.getElementById('test-next-2').onclick;
+        document.getElementById('test-next-2').onclick = function(){
+            if(window.selectedDatasets.length===0){alert('请至少选择一个数据集！');return;}
+            renderSegmentProgressBar(0);
+            if(oldTestNext2) oldTestNext2();
+        };
+        // 初始化
+        renderDatasetGroupList();
+        renderDatasetSubGroupList();
+        renderDatasetList();
+        renderSelectedDatasetsBar();
+        // 横向柱状图，包含本次测评模型
+        function renderBarChart() {
+            const modelName = document.getElementById('result-model-name').innerText || 'Model-X';
+            // 示例数据，实际可根据测评结果动态生成
+            let data = [
+                {name: modelName, score: 95.2},
+                {name: 'Model-Y', score: 92.1},
+                {name: 'Model-Z', score: 90.3}
+            ];
+            // 按分数降序
+            data = data.sort((a,b)=>b.score-a.score);
+            const ctx = document.getElementById('barChart').getContext('2d');
+            if(window.barChartInstance) window.barChartInstance.destroy();
+            window.barChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(d=>d.name),
+                    datasets: [{
+                        label: '分数',
+                        data: data.map(d=>d.score),
+                        backgroundColor: data.map((d,i)=>[
+                            'rgba(44,62,80,0.18)',   // 灰蓝
+                            'rgba(82,196,26,0.18)',  // 灰绿
+                            'rgba(250,173,20,0.18)'  // 灰黄
+                        ][i]||'rgba(180,180,180,0.18)'),
+                        borderRadius: 8,
+                        barThickness: 32,
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            min: 0,
+                            max: 100,
+                            grid: { display: false, drawBorder: false },
+                            ticks: { color: '#b0b0b0', font: { size: 15 } }
+                        },
+                        y: {
+                            grid: { display: false },
+                            ticks: { color: '#888', font: { size: 16, weight: 'bold' } }
+                        }
+                    }
+                }
+            });
+        }
+        // 页面初次加载时如果就是第4步也渲染一次
+        if(document.getElementById('test-step-4').style.display!=='none'){
+            renderBarChart();
+        }
+        // 检查API可用性
+        (function(){
+            const btn = document.getElementById('btn-check-api');
+            const input = document.getElementById('input-api-url');
+            const result = document.getElementById('api-check-result');
+            if(!btn || !input || !result) return;
+            btn.onclick = async function(){
+                const url = input.value.trim();
+                if(!url){ result.style.color='#f5222d'; result.innerHTML='请输入API'; return; }
+                result.innerHTML = '正在检查...'; result.style.color='#888';
+                try {
+                    const resp = await fetch(url, {method:'GET'});
+                    if(resp.ok){
+                        result.style.color = '#52c41a';
+                        result.innerHTML = 'API可用 <svg width="18" height="18" style="vertical-align:middle;margin-left:2px;" viewBox="0 0 24 24" fill="none" stroke="#52c41a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 10 18 4 12"/></svg>';
+                    }else{
+                        result.style.color = '#f5222d';
+                        result.innerHTML = 'API调用失败 <svg width="18" height="18" style="vertical-align:middle;margin-left:2px;" viewBox="0 0 24 24" fill="none" stroke="#f5222d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+                    }
+                }catch(e){
+                    result.style.color = '#f5222d';
+                    result.innerHTML = 'API调用失败 <svg width="18" height="18" style="vertical-align:middle;margin-left:2px;" viewBox="0 0 24 24" fill="none" stroke="#f5222d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+                }
+            };
+        })();
+    </script>
+</body>
+</html> 
