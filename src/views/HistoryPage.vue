@@ -21,12 +21,7 @@
               clearable
               style="width: 220px;"
             >
-              <el-option label="全部状态" value="" />
-              <el-option label="等待中" value="pending" />
-              <el-option label="测评中" value="running" />
-              <el-option label="检测完成-发现后门" value="completed-danger" />
-              <el-option label="检测完成-未发现后门" value="completed-safe" />
-              <el-option label="检测失败" value="failed" />
+              <el-option v-for="opt in statusOptions" :key="opt.value" :label="opt.label" :value="opt.value" />
             </el-select>
           </div>
           <el-button type="primary" @click="createNewTask" style="font-weight: 500;" >
@@ -68,7 +63,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { View, Document, Warning, Loading, Promotion, Search, Plus } from '@element-plus/icons-vue'
+import { View, Document, Warning, Loading, AlarmClock, Search, Plus } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import LoadingSpinner from '../components/common/LoadingSpinner.vue'
@@ -85,6 +80,23 @@ const totalItems = ref(0)
 const tasks = ref([])
 const loading = ref(false)
 const pollingTimer = ref(null)
+
+const STATUS_MAP = {
+  pending: '等待中',
+  running: '测评中',
+  completed: '评估完成',
+  'completed-danger': '评估完成',
+  'completed-safe': '评估完成',
+  failed: '评估失败'
+}
+
+const statusOptions = [
+  { label: '全部状态', value: '' },
+  { label: '等待中', value: 'pending' },
+  { label: '测评中', value: 'running' },
+  { label: '评估完成', value: 'completed' },
+  { label: '评估失败', value: 'failed' }
+]
 
 const loadTasks = async () => {
   loading.value = true
@@ -125,12 +137,18 @@ const handlePageChange = (page) => {
 
 const filteredTasks = computed(() => {
   return tasks.value.filter(task => {
-    const id = task.id || task.task_id || ''
+    const id = task.taskId || task.id || task.task_id || ''
     const modelName = task.modelName || task.model_name || ''
+    // 支持任务ID和模型名称的模糊搜索
     const matchesSearch = !searchQuery.value ||
-      id.includes(searchQuery.value) ||
-      modelName.includes(searchQuery.value)
-    const matchesStatus = !statusFilter.value || task.status === statusFilter.value
+      id.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      modelName.toLowerCase().includes(searchQuery.value.toLowerCase())
+    // 统一completed相关状态
+    let normalizedStatus = task.status
+    if (["completed", "completed-danger", "completed-safe"].includes(task.status)) {
+      normalizedStatus = "completed"
+    }
+    const matchesStatus = !statusFilter.value || normalizedStatus === statusFilter.value
     return matchesSearch && matchesStatus
   })
 })
@@ -140,36 +158,37 @@ const pagedTasks = computed(() => {
 })
 
 const getTaskLink = (task) => {
-  // 检查测评类型是否包含红队或越狱关键词
   const abilityName = task.abilityName || task.ability_name || '';
+  const isBackdoor = abilityName.includes('后门检测');
   const isRedTeam = abilityName.includes('红队') || abilityName.includes('越狱');
-  
-  // 如果是红队测试类型且状态为running，跳转到进度页面
+
+  if (isBackdoor && task.status === 'running') {
+    return `/backdoor-progress/${task.id}`;
+  }
+  if (isBackdoor) {
+    return `/backdoor-report/${task.id}`;
+  }
   if (isRedTeam && task.status === 'running') {
     return `/red-team-progress/${task.id}`;
   }
-  
-  // 如果是红队测试类型且已完成，跳转到红队报告页面
   if (isRedTeam) {
     return `/red-team-report/${task.id}`;
   }
-  
-  // 其他类型的任务保持原有逻辑
-  if (task.status === 'completed-danger' || task.status === 'completed-safe') {
-    return `/report/${task.id}`;
+  if (task.status === 'completed') {
+    return `/task/${task.id}`;
   }
   return `/task/${task.id}`;
 }
 
 const getTaskActionText = (task) => {
-  if (task.status === 'completed-danger' || task.status === 'completed-safe') {
+  if (task.status === 'completed' || task.status === 'completed-danger' || task.status === 'completed-safe') {
     return '查看报告'
   } else if (task.status === 'failed') {
     return '查看详情'
   } else if (task.status === 'running') {
     return '查看进度'
-  } else {
-    return '开始测评'
+  } else { // 等待中
+    return '查看排队进度'
   }
 }
 
@@ -178,26 +197,26 @@ const createNewTask = () => {
 }
 
 const getActionType = (task) => {
-  if (task.status === 'completed-danger' || task.status === 'completed-safe') {
+  if (task.status === 'completed' || task.status === 'completed-danger' || task.status === 'completed-safe') {
     return 'primary'
   } else if (task.status === 'failed') {
     return 'danger'
   } else if (task.status === 'running') {
     return 'warning'
-  } else {
-    return 'success'
+  } else { // 等待中
+    return 'info'
   }
 }
 
 const getActionIcon = (task) => {
-  if (task.status === 'completed-danger' || task.status === 'completed-safe') {
+  if (task.status === 'completed' || task.status === 'completed-danger' || task.status === 'completed-safe') {
     return View
   } else if (task.status === 'failed') {
     return Warning
   } else if (task.status === 'running') {
     return Loading
-  } else {
-    return Promotion
+  } else { // 等待中
+    return AlarmClock
   }
 }
 </script> 

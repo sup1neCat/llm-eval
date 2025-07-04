@@ -48,11 +48,6 @@ const routes = [
     component: () => import('../views/TaskDetail.vue')
   },
   {
-    path: '/report/:id',
-    name: 'BackdoorReport',
-    component: () => import('../views/BackdoorDetailPage.vue')
-  },
-  {
     path: '/red-team-report/:id',
     name: 'RedTeamReport',
     component: () => import('../views/RedTeamReportPage.vue')
@@ -66,6 +61,16 @@ const routes = [
     path: '/evaluation/create',
     name: 'EvaluationCreation',
     component: () => import('../views/EvaluationCreationPage.vue')
+  },
+  {
+    path: '/backdoor-progress/:id',
+    name: 'BackdoorProgress',
+    component: () => import('../views/BackdoorProgressPage.vue')
+  },
+  {
+    path: '/backdoor-report/:id',
+    name: 'BackdoorReport',
+    component: () => import('../views/BackdoorDetailPage.vue')
   }
 ]
 
