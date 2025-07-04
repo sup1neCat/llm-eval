@@ -36,7 +36,7 @@
         </div>
         <template v-if="loading">
           <LoadingSpinner text="正在加载任务列表..." />
-            </template>
+        </template>
         <template v-else>
           <TaskList
             :tasks="pagedTasks"
@@ -64,13 +64,16 @@
       </el-card>
     </div>
   </div>
-  <router-view />
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { View, Document, Warning, Loading, Promotion, Search, Plus } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
+import LoadingSpinner from '../components/common/LoadingSpinner.vue'
+import TaskList from '../components/common/TaskList.vue'
+import { fetchEvaluationHistory } from '../apis/evaluation'
 
 const router = useRouter()
 

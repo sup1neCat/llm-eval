@@ -35,14 +35,12 @@ const routes = [
   {
     path: '/history',
     name: 'History',
-    component: () => import('../views/HistoryPage.vue'),
-    children: [
-      {
-        path: 'createTask',
-        name: 'HistoryCreateTask',
-        component: () => import('../views/CreateTask.vue')
-      }
-    ]
+    component: () => import('../views/HistoryPage.vue')
+  },
+  {
+    path: '/history/createTask',
+    name: 'HistoryCreateTask',
+    component: () => import('../views/CreateTask.vue')
   },
   {
     path: '/task/:id',
