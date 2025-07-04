@@ -44,7 +44,7 @@
             :confidence="metricResults.confidence_score !== undefined ? Math.round(metricResults.confidence_score * 100) : 0"
             :attackSuccess="metricResults.attack_success_rate !== undefined ? Math.round(metricResults.attack_success_rate * 100) : 0"
             :cleanAccuracy="metricResults.clean_accuracy !== undefined ? Math.round(metricResults.clean_accuracy * 100) : 0"
-            :triggers="Array.isArray(metricResults.detected_trigger_words) ? metricResults.detected_trigger_words : []"
+            :triggers="report.triggers.map(t => t.word)"
             :title="report.hasBackdoor ? (report.summaryTitle || '检测到后门') : (report.summaryTitle || '未检测到后门')"
           />
           <div style="display: flex; justify-content: center; align-items: center; gap: 48px; margin-bottom: 32px;">
@@ -201,7 +201,12 @@
                 </el-table-column>
                 <el-table-column label="值">
                   <template #default="scope">
-                    <span v-if="Array.isArray(scope.row[1])">{{ scope.row[1].join(', ') }}</span>
+                    <span v-if="scope.row[0] === 'detected_trigger_words' && Array.isArray(scope.row[1])">
+                      {{ scope.row[1].map(x => typeof x === 'object' && x !== null ? x.word : x).join(', ') }}
+                    </span>
+                    <span v-else-if="Array.isArray(scope.row[1])">
+                      {{ scope.row[1].join(', ') }}
+                    </span>
                     <span v-else>{{ scope.row[1] }}</span>
                   </template>
                 </el-table-column>
