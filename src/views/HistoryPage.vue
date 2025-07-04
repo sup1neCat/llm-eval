@@ -139,10 +139,25 @@ const pagedTasks = computed(() => {
 })
 
 const getTaskLink = (task) => {
-  if (task.status === 'completed-danger' || task.status === 'completed-safe') {
-    return `/report/${task.id}`
+  // 检查测评类型是否包含红队或越狱关键词
+  const abilityName = task.abilityName || task.ability_name || '';
+  const isRedTeam = abilityName.includes('红队') || abilityName.includes('越狱');
+  
+  // 如果是红队测试类型且状态为running，跳转到进度页面
+  if (isRedTeam && task.status === 'running') {
+    return `/red-team-progress/${task.id}`;
   }
-  return `/task/${task.id}`
+  
+  // 如果是红队测试类型且已完成，跳转到红队报告页面
+  if (isRedTeam) {
+    return `/red-team-report/${task.id}`;
+  }
+  
+  // 其他类型的任务保持原有逻辑
+  if (task.status === 'completed-danger' || task.status === 'completed-safe') {
+    return `/report/${task.id}`;
+  }
+  return `/task/${task.id}`;
 }
 
 const getTaskActionText = (task) => {

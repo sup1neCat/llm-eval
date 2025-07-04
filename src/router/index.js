@@ -41,6 +41,16 @@ const routes = [
     component: () => import('../views/BackdoorDetailPage.vue')
   },
   {
+    path: '/red-team-report/:id',
+    name: 'RedTeamReport',
+    component: () => import('../views/RedTeamReportPage.vue')
+  },
+  {
+    path: '/red-team-progress/:id',
+    name: 'RedTeamProgress',
+    component: () => import('../views/RedTeamProgressPage.vue')
+  },
+  {
     path: '/evaluation/create',
     name: 'EvaluationCreation',
     component: () => import('../views/EvaluationCreationPage.vue')
