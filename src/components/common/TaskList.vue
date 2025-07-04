@@ -4,7 +4,7 @@
     <el-table-column prop="modelName" label="模型名称" width="200" />
     <el-table-column prop="abilityName" label="测评类型" width="160" />
     <el-table-column prop="submitTime" label="提交时间" width="200" />
-    <el-table-column label="状态" width="180" align="center">
+    <el-table-column label="状态" align="center" :min-width="180">
       <template #default="scope">
         <StatusIndicator :status="scope.row.status" />
       </template>
