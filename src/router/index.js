@@ -48,11 +48,6 @@ const routes = [
     component: () => import('../views/TaskDetail.vue')
   },
   {
-    path: '/report/:id',
-    name: 'BackdoorReport',
-    component: () => import('../views/BackdoorDetailPage.vue')
-  },
-  {
     path: '/red-team-report/:id',
     name: 'RedTeamReport',
     component: () => import('../views/RedTeamReportPage.vue')
