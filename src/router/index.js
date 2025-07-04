@@ -13,7 +13,14 @@ const routes = [
   {
     path: '/test-platform',
     name: 'TestPlatform',
-    component: () => import('../views/TestPlatform.vue')
+    component: () => import('../views/TestPlatform.vue'),
+    children: [
+      {
+        path: 'createTask',
+        name: 'TestPlatformCreateTask',
+        component: () => import('../views/CreateTask.vue')
+      }
+    ]
   },
   {
     path: '/leaderboard',
@@ -31,6 +38,11 @@ const routes = [
     component: () => import('../views/HistoryPage.vue')
   },
   {
+    path: '/history/createTask',
+    name: 'HistoryCreateTask',
+    component: () => import('../views/CreateTask.vue')
+  },
+  {
     path: '/task/:id',
     name: 'TaskDetail',
     component: () => import('../views/TaskDetail.vue')
@@ -39,6 +51,16 @@ const routes = [
     path: '/report/:id',
     name: 'BackdoorReport',
     component: () => import('../views/BackdoorDetailPage.vue')
+  },
+  {
+    path: '/red-team-report/:id',
+    name: 'RedTeamReport',
+    component: () => import('../views/RedTeamReportPage.vue')
+  },
+  {
+    path: '/red-team-progress/:id',
+    name: 'RedTeamProgress',
+    component: () => import('../views/RedTeamProgressPage.vue')
   },
   {
     path: '/evaluation/create',
