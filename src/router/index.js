@@ -35,14 +35,12 @@ const routes = [
   {
     path: '/history',
     name: 'History',
-    component: () => import('../views/HistoryPage.vue'),
-    children: [
-      {
-        path: 'createTask',
-        name: 'HistoryCreateTask',
-        component: () => import('../views/CreateTask.vue')
-      }
-    ]
+    component: () => import('../views/HistoryPage.vue')
+  },
+  {
+    path: '/history/createTask',
+    name: 'HistoryCreateTask',
+    component: () => import('../views/CreateTask.vue')
   },
   {
     path: '/task/:id',
@@ -50,9 +48,14 @@ const routes = [
     component: () => import('../views/TaskDetail.vue')
   },
   {
-    path: '/report/:id',
-    name: 'BackdoorReport',
-    component: () => import('../views/BackdoorDetailPage.vue')
+    path: '/red-team-report/:id',
+    name: 'RedTeamReport',
+    component: () => import('../views/RedTeamReportPage.vue')
+  },
+  {
+    path: '/red-team-progress/:id',
+    name: 'RedTeamProgress',
+    component: () => import('../views/RedTeamProgressPage.vue')
   },
   {
     path: '/evaluation/create',
