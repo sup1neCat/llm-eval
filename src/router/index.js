@@ -58,6 +58,11 @@ const routes = [
     path: '/evaluation/create',
     name: 'EvaluationCreation',
     component: () => import('../views/EvaluationCreationPage.vue')
+  },
+  {
+    path: '/general-test',
+    name: 'GeneralTest',
+    component: () => import('../views/GeneralTest.vue')
   }
 ]
 
