@@ -49,6 +49,6 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 
 function goToCreateTask() {
-  router.push('/test-platform/createTask')
+  router.push('/general-test')
 }
 </script>

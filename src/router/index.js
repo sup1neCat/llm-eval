@@ -63,14 +63,9 @@ const routes = [
     component: () => import('../views/EvaluationCreationPage.vue')
   },
   {
-    path: '/backdoor-progress/:id',
-    name: 'BackdoorProgress',
-    component: () => import('../views/BackdoorProgressPage.vue')
-  },
-  {
-    path: '/backdoor-report/:id',
-    name: 'BackdoorReport',
-    component: () => import('../views/BackdoorDetailPage.vue')
+    path: '/general-test',
+    name: 'GeneralTest',
+    component: () => import('../views/GeneralTest.vue')
   }
 ]
 
