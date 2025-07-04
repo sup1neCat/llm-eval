@@ -14,9 +14,9 @@ const props = defineProps({
   abilityName: { type: String, default: '' }
 })
 
-// 标准状态映射
+// 标准及后门检测状态映射
 const standardStatusMap = {
-  pending: { label: '等待中', type: 'info', icon: Loading },
+  pending: { label: '等待中', type: 'info', icon: AlarmClock },
   running: { label: '测评中', type: 'warning', icon: Loading },
   completed: { label: '测评完成', type: 'success', icon: Finished },
   'completed-danger': { label: '检测完成-发现后门', type: 'danger', icon: WarningFilled },
