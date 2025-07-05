@@ -161,6 +161,7 @@ const getTaskLink = (task) => {
   const abilityName = task.abilityName || task.ability_name || '';
   const isBackdoor = abilityName.includes('后门检测');
   const isRedTeam = abilityName.includes('红队') || abilityName.includes('越狱');
+  const isFlames = abilityName.toLowerCase().includes('flames');
 
   if (isBackdoor && task.status === 'running') {
     return `/backdoor-progress/${task.id}`;
@@ -173,6 +174,9 @@ const getTaskLink = (task) => {
   }
   if (isRedTeam) {
     return `/red-team-report/${task.id}`;
+  }
+  if (isFlames && task.status === 'completed') {
+    return `/flames-report/${task.id}`;
   }
   if (task.status === 'completed') {
     return `/task/${task.id}`;
