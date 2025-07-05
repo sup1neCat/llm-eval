@@ -57,3 +57,12 @@ export const downloadReportPDF = (taskId) => {
 export const downloadLogFile = (taskId) => {
   window.location.href = `/api/v1/evaluations/${taskId}/log/download`
 }
+
+// 获取FlamesTask报告数据
+export const fetchFlamesReport = async (taskId) => {
+  // 这里假设接口为 /api/v1/flames/report/:id，实际可根据后端API调整
+  // const { data } = await axios.get(`/api/v1/flames/report/${taskId}`)
+  const { data } = await axios.get(`http://127.0.0.1:4523/m2/6574561-6279588-default/317867156`)
+  
+  return data
+}
