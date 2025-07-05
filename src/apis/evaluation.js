@@ -8,7 +8,7 @@ export const fetchEvaluationReport = async (taskId) => {
 
 // 获取评估任务历史记录（分页/筛选参数可根据实际调整）
 export const fetchEvaluationHistory = async (params = {}) => {
-  const { data } = await axios.get('http://127.0.0.1:4523/m1/6574561-6279588-default/api/v1/me/evaluations', { params })
+  const { data } = await axios.get('https://m1.apifoxmock.com/m1/6574561-6279588-default/api/v1/me/evaluations', { params })
   return data
 }
 
