@@ -158,14 +158,8 @@ const pagedTasks = computed(() => {
 })
 
 const getTaskLink = (task) => {
-  // 检查是否为FlamesTask类型
   const abilityName = task.abilityName || task.ability_name || '';
-  const type = task.type || '';
-  const isFlames = abilityName.toLowerCase().includes('flames') || type.toLowerCase().includes('flames');
-  if (isFlames && (task.status === 'completed-danger' || task.status === 'completed-safe')) {
-    return `/flames-report/${task.id || task.taskId || task.task_id}`;
-  }
-  // 检查测评类型是否包含红队或越狱关键词
+  const isBackdoor = abilityName.includes('后门检测');
   const isRedTeam = abilityName.includes('红队') || abilityName.includes('越狱');
 
   if (isBackdoor && task.status === 'running') {
@@ -189,7 +183,7 @@ const getTaskLink = (task) => {
 const getTaskActionText = (task) => {
   if (task.status === 'completed' || task.status === 'completed-danger' || task.status === 'completed-safe') {
     return '查看报告'
-  } else if (task.status === 'failed' ) {
+  } else if (task.status === 'failed') {
     return '查看详情'
   } else if (task.status === 'running') {
     return '查看进度'
